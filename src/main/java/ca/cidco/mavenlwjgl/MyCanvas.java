@@ -20,6 +20,10 @@ import org.lwjgl.opengl.awt.GLData;
 public class MyCanvas extends AWTGLCanvas {
 
     BufferedImage image;
+    
+    float scale = 1.0f;
+    float rotateX = 0.0f;
+    float rotateY = 0.0f;
 
     public MyCanvas() {
         super();
@@ -32,18 +36,95 @@ public class MyCanvas extends AWTGLCanvas {
     @Override
     public void initGL() {
         GL.createCapabilities();
-        glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1);
         glEnable(GL_DEPTH_TEST);
     }
 
     @Override
     public void paintGL() {
+        int w = getWidth();
+        int h = getHeight();
+        float aspect = (float) w / h;
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
+        glLoadIdentity();
+        glViewport(0, 0, w, h);
+        glScalef(scale, scale, 1.0f);
         
+        glRotatef(rotateX, 1.0f, 0.0f, 0.0f);
+        glRotatef(rotateY, 0.0f, 1.0f, 0.0f);
+        
+        //Multi-colored side - FRONT
+        glBegin(GL_POLYGON);
+        glColor3f(1.0f, 0.0f, 0.0f);
+        glVertex3f(0.5f, -0.5f, -0.5f);
+        glColor3f(0.0f, 1.0f, 0.0f);
+        glVertex3f(0.5f, 0.5f, -0.5f);
+        glColor3f(0.0f, 0.0f, 1.0f);
+        glVertex3f(-0.5f, 0.5f, -0.5f);
+        glColor3f(1.0f, 0.0f, 1.0f);
+        glVertex3f(-0.5f, -0.5f, -0.5f);
+        glEnd();
+
+        // White side - BACK
+        glBegin(GL_POLYGON);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glVertex3f(0.5f, -0.5f, 0.5f);
+        glVertex3f(0.5f, 0.5f, 0.5f);
+        glVertex3f(-0.5f, 0.5f, 0.5f);
+        glVertex3f(-0.5f, -0.5f, 0.5f);
+        glEnd();
+
+        // Purple side - RIGHT
+        glBegin(GL_POLYGON);
+        glColor3f(1.0f, 0.0f, 1.0f);
+        glVertex3f(0.5f, -0.5f, -0.5f);
+        glVertex3f(0.5f, 0.5f, -0.5f);
+        glVertex3f(0.5f, 0.5f, 0.5f);
+        glVertex3f(0.5f, -0.5f, 0.5f);
+        glEnd();
+
+        // Green side - LEFT
+        glBegin(GL_POLYGON);
+        glColor3f(0.0f, 1.0f, 0.0f);
+        glVertex3f(-0.5f, -0.5f, 0.5f);
+        glVertex3f(-0.5f, 0.5f, 0.5f);
+        glVertex3f(-0.5f, 0.5f, -0.5f);
+        glVertex3f(-0.5f, -0.5f, -0.5f);
+        glEnd();
+
+        // Blue side - TOP
+        glBegin(GL_POLYGON);
+        glColor3f(0.0f, 0.0f, 1.0f);
+        glVertex3f(0.5f, 0.5f, 0.5f);
+        glVertex3f(0.5f, 0.5f, -0.5f);
+        glVertex3f(-0.5f, 0.5f, -0.5f);
+        glVertex3f(-0.5f, 0.5f, 0.5f);
+        glEnd();
+
+        // Red side - BOTTOM
+        glBegin(GL_POLYGON);
+        glColor3f(1.0f, 0.0f, 0.0f);
+        glVertex3f(0.5f, -0.5f, -0.5f);
+        glVertex3f(0.5f, -0.5f, 0.5f);
+        glVertex3f(-0.5f, -0.5f, 0.5f);
+        glVertex3f(-0.5f, -0.5f, -0.5f);
+        glEnd();
 
         swapBuffers();
         image = createImage();
+    }
+
+    public void zoom(int time) {
+        scale += time * -0.025f;
+        if (scale <= 0.0f)
+            scale = 0.0f;
+    }
+    
+    public void rotate(float angleX, float angleY){
+        rotateX += angleX;
+        rotateY += angleY;
     }
 
     //https://stackoverflow.com/questions/21948804/how-would-i-get-a-bufferedimage-from-an-opengl-window

@@ -37,6 +37,10 @@ public class LWJGLPanel extends JPanel {
         add(canvas, BorderLayout.CENTER);
     }
     
+    public MyCanvas getCanvas(){
+        return canvas;
+    }
+    
     public void render(){
         canvas.render();
     }
@@ -48,10 +52,6 @@ public class LWJGLPanel extends JPanel {
     @Override
     public void setSize(Dimension dm){
         canvas.setSize(dm);
-    }
-    
-    public void resetCanvasContext(){
-        canvas.resetContext();
     }
     
     /**

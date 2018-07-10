@@ -55,63 +55,15 @@ public class MyCanvas extends AWTGLCanvas {
         glRotatef(rotateX, 1.0f, 0.0f, 0.0f);
         glRotatef(rotateY, 0.0f, 1.0f, 0.0f);
         
-        //Multi-colored side - FRONT
-        glBegin(GL_POLYGON);
-        glColor3f(1.0f, 0.0f, 0.0f);
-        glVertex3f(0.5f, -0.5f, -0.5f);
-        glColor3f(0.0f, 1.0f, 0.0f);
-        glVertex3f(0.5f, 0.5f, -0.5f);
-        glColor3f(0.0f, 0.0f, 1.0f);
-        glVertex3f(-0.5f, 0.5f, -0.5f);
-        glColor3f(1.0f, 0.0f, 1.0f);
-        glVertex3f(-0.5f, -0.5f, -0.5f);
-        glEnd();
-
-        // White side - BACK
-        glBegin(GL_POLYGON);
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glVertex3f(0.5f, -0.5f, 0.5f);
-        glVertex3f(0.5f, 0.5f, 0.5f);
-        glVertex3f(-0.5f, 0.5f, 0.5f);
-        glVertex3f(-0.5f, -0.5f, 0.5f);
-        glEnd();
-
-        // Purple side - RIGHT
-        glBegin(GL_POLYGON);
-        glColor3f(1.0f, 0.0f, 1.0f);
-        glVertex3f(0.5f, -0.5f, -0.5f);
-        glVertex3f(0.5f, 0.5f, -0.5f);
-        glVertex3f(0.5f, 0.5f, 0.5f);
-        glVertex3f(0.5f, -0.5f, 0.5f);
-        glEnd();
-
-        // Green side - LEFT
-        glBegin(GL_POLYGON);
-        glColor3f(0.0f, 1.0f, 0.0f);
-        glVertex3f(-0.5f, -0.5f, 0.5f);
-        glVertex3f(-0.5f, 0.5f, 0.5f);
-        glVertex3f(-0.5f, 0.5f, -0.5f);
-        glVertex3f(-0.5f, -0.5f, -0.5f);
-        glEnd();
-
-        // Blue side - TOP
-        glBegin(GL_POLYGON);
-        glColor3f(0.0f, 0.0f, 1.0f);
-        glVertex3f(0.5f, 0.5f, 0.5f);
-        glVertex3f(0.5f, 0.5f, -0.5f);
-        glVertex3f(-0.5f, 0.5f, -0.5f);
-        glVertex3f(-0.5f, 0.5f, 0.5f);
-        glEnd();
-
-        // Red side - BOTTOM
-        glBegin(GL_POLYGON);
-        glColor3f(1.0f, 0.0f, 0.0f);
-        glVertex3f(0.5f, -0.5f, -0.5f);
-        glVertex3f(0.5f, -0.5f, 0.5f);
-        glVertex3f(-0.5f, -0.5f, 0.5f);
-        glVertex3f(-0.5f, -0.5f, -0.5f);
-        glEnd();
-
+        for (int i = -500; i < 501; i++) {
+            for (int j = -500; j < 501; j++) {
+                glPushMatrix();
+                glTranslatef(i, j, 0.0f);
+                DrawUtils.drawCube(0.5f, 0.5f, 0.5f);
+                glPopMatrix();
+            }
+        }
+        
         swapBuffers();
         image = createImage();
     }

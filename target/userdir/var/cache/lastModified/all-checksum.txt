@@ -1,0 +1,17 @@
+netbeans-8.2/platform=1527022213000
+cluster.netbeans-8.2/nb=1527022179000
+cluster.netbeans-8.2/ide=1527022214000
+cluster.netbeans-8.2/extide=1527022182000
+cluster.netbeans-8.2/java=1527022214000
+cluster.netbeans-8.2/apisupport=1527022195000
+cluster.netbeans-8.2/websvccommon=1527022182000
+cluster.netbeans-8.2/profiler=1527022215000
+cluster.netbeans-8.2/harness=1527022195000
+cluster.netbeans-8.2/javafx=1475191956000
+cluster.Workspace/MavenLWJGL/target/netbeans_clusters/extra=1531243130000
+user=1531243130000
+crc=7
+locale=en_CA
+branding=nb
+java.version=1.8.0_171
+java.vm.version=25.171-b11

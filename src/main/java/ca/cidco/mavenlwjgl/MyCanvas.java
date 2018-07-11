@@ -86,26 +86,48 @@ public class MyCanvas extends AWTGLCanvas {
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
           
-        float[] vertices = {
-            -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            0.0f, 0.5f, 0.0f
+        float[][] vertices = {
+            {
+                -0.9f, -0.5f, 0.0f,
+                -0.0f, -0.5f, 0.0f,
+                -0.45f, 0.5f, 0.0f
+            },
+            {
+                0.9f, -0.5f, 0.0f,
+                0.0f, -0.5f, 0.0f,
+                0.45f, 0.5f, 0.0f
+            }
         };
         
-        int VAO = glGenVertexArrays();
-        glBindVertexArray(VAO);
+        int[] VAOs = new int[2];
+        int[] VBOs = new int[2];
         
-        int VBO = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
-        
+        glGenVertexArrays(VAOs);
+        glGenBuffers(VBOs);
+
+        //Triangle 1
+        glBindVertexArray(VAOs[0]);
+        glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
+        glBufferData(GL_ARRAY_BUFFER, vertices[0], GL_STATIC_DRAW);
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
         glEnableVertexAttribArray(0);
-        glBindVertexArray(VAO);
         
+        //Triangle 2
+        glBindVertexArray(VAOs[1]);
+        glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
+        glBufferData(GL_ARRAY_BUFFER, vertices[1], GL_STATIC_DRAW);
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+        glEnableVertexAttribArray(0);
+        
+        //Draw
         glUseProgram(shaderProgram);
-        glBindVertexArray(VAO);
+        glBindVertexArray(VAOs[0]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
+        glBindVertexArray(VAOs[1]);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        
+        
+        
         
         /* Old code
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -7,13 +7,13 @@ package ca.cidco.mavenlwjgl;
 
 import ca.cidco.opengl.OpenGLFileReader;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.nio.FloatBuffer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL30.*;
 import org.lwjgl.opengl.awt.AWTGLCanvas;
 import org.lwjgl.opengl.awt.GLData;
 
@@ -42,8 +42,8 @@ public class MyCanvas extends AWTGLCanvas {
     @Override
     public void initGL() {
         GL.createCapabilities();
-        glClearColor(0.0f, 0.0f, 0.0f, 1);
-        glEnable(GL_DEPTH_TEST);
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        //glEnable(GL_DEPTH_TEST);
     }
 
     @Override
@@ -52,17 +52,12 @@ public class MyCanvas extends AWTGLCanvas {
         int h = getHeight();
         float aspect = (float) w / h;
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT);
         
-        glLoadIdentity();
         glViewport(0, 0, w, h);
         
         //Following the LeanOpenGL tutorial from https://learnopengl.com
         //Hello Triangle
-        int VBO = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER,vertices, GL_STATIC_DRAW);
-        
         int vertexShader = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertexShader, OpenGLFileReader.loadVertex("simpleshader.vert"));
         glCompileShader(vertexShader);
@@ -88,11 +83,36 @@ public class MyCanvas extends AWTGLCanvas {
             System.out.println(glGetProgramInfoLog(shaderProgram));
         }
         
-        glUseProgram(shaderProgram);
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
+          
+        float[] vertices = {
+            -0.5f, -0.5f, 0.0f,
+            0.5f, -0.5f, 0.0f,
+            0.0f, 0.5f, 0.0f
+        };
+        
+        int VAO = glGenVertexArrays();
+        glBindVertexArray(VAO);
+        
+        int VBO = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
+        
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+        glEnableVertexAttribArray(0);
+        glBindVertexArray(VAO);
+        
+        glUseProgram(shaderProgram);
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
         
         /* Old code
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+        glLoadIdentity();
+        glViewport(0, 0, w, h);
+        
         glScalef(scale, scale, 1.0f);
         glTranslatef(panX, panY, 0.0f);
         
@@ -109,19 +129,8 @@ public class MyCanvas extends AWTGLCanvas {
         swapBuffers();
         image = createImage();
     }
-    
-    float[] vertices = {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f
-    };
-    
-    
-    
-    
-    
-    
 
+ 
     public void zoom(int time) {
         scale += time * -0.025f;
         if (scale <= 0.0f)

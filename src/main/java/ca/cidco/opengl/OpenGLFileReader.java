@@ -17,11 +17,11 @@ import java.io.InputStreamReader;
  */
 public class OpenGLFileReader {
 
-    public static StringBuilder loadShader(String filename) {
+    public static StringBuilder loadVertex(String filename) {
         StringBuilder shaderSource = new StringBuilder();
 
         try {
-            InputStream inputStream = OpenGLFileReader.class.getResourceAsStream("shaders/" + filename);
+            InputStream inputStream = OpenGLFileReader.class.getResourceAsStream("shaders/vertex/" + filename);
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             String line;
             while ((line = reader.readLine()) != null) {
@@ -35,4 +35,22 @@ public class OpenGLFileReader {
         return shaderSource;
     }
 
+    public static StringBuilder loadFragment(String filename){
+        StringBuilder shaderSource = new StringBuilder();
+
+        try {
+            InputStream inputStream = OpenGLFileReader.class.getResourceAsStream("shaders/fragment/" + filename);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                shaderSource.append(line).append("//\n");
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return shaderSource;
+    }
+    
 }

@@ -64,13 +64,33 @@ public class MyCanvas extends AWTGLCanvas {
         glBufferData(GL_ARRAY_BUFFER,vertices, GL_STATIC_DRAW);
         
         int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertexShader, OpenGLFileReader.loadShader("simpleshader.vert"));
+        glShaderSource(vertexShader, OpenGLFileReader.loadVertex("simpleshader.vert"));
         glCompileShader(vertexShader);
-        
         int success = glGetShaderi(vertexShader, GL_COMPILE_STATUS);
         if (success == GL_FALSE){
             System.out.println(glGetShaderInfoLog(vertexShader));
         }
+        
+        int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fragmentShader, OpenGLFileReader.loadFragment("simpleshader.frag"));
+        glCompileShader(fragmentShader);
+        success = glGetShaderi(fragmentShader, GL_COMPILE_STATUS);
+        if (success == GL_FALSE){
+            System.out.println(glGetShaderInfoLog(fragmentShader));
+        }
+        
+        int shaderProgram = glCreateProgram();
+        glAttachShader(shaderProgram, vertexShader);
+        glAttachShader(shaderProgram, fragmentShader);
+        glLinkProgram(shaderProgram);
+        success = glGetProgrami(shaderProgram, GL_LINK_STATUS);
+        if (success == GL_FALSE){
+            System.out.println(glGetProgramInfoLog(shaderProgram));
+        }
+        
+        glUseProgram(shaderProgram);
+        glDeleteShader(vertexShader);
+        glDeleteShader(fragmentShader);
         
         /* Old code
         glScalef(scale, scale, 1.0f);

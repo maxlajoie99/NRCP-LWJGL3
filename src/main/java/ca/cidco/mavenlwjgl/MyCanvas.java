@@ -110,14 +110,14 @@ public class MyCanvas extends AWTGLCanvas {
         glEnableVertexAttribArray(1);
         glBindVertexArray(VAO);
         
+        //Why is the bottom-left side of our triangle black?
+        /* Le code RGB est (-0.5, -0.5, 0.0). Les valeurs doivent cependant se
+         * trouver entre 0.0 et 1.0 pour être valides. Les deux valeurs négatives
+         * sont alors "clamper" à 0.0 jusqu'à ce qu'elles soient à nouveau positives 
+         * lors de l'interpolation linéaire. RGB(0.0, 0.0, 0.0) est la couleur noire.
+         */
+        
         glUseProgram(shaderProgram);
-        
-        /* Uniform
-        time += 1f;
-        float greenValue = ((float)Math.sin((double)time)/2.0f) + 0.5f;
-        int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);*/
-        
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         

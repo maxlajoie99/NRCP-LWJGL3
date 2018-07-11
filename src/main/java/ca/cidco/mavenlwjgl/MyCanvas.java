@@ -87,9 +87,14 @@ public class MyCanvas extends AWTGLCanvas {
         glDeleteShader(fragmentShader);
           
         float[] vertices = {
-            -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            0.0f, 0.5f, 0.0f
+            //First triangle
+            -0.9f, -0.5f, 0.0f,
+            -0.0f, -0.5f, 0.0f,
+            -0.45f, 0.5f, 0.0f,
+            //Second triangle
+            0.9f, -0.5f, 0.0f,
+            0.0f, -0.5f, 0.0f,
+            0.45f, 0.5f, 0.0f
         };
         
         int VAO = glGenVertexArrays();
@@ -105,7 +110,7 @@ public class MyCanvas extends AWTGLCanvas {
         
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
         
         /* Old code
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

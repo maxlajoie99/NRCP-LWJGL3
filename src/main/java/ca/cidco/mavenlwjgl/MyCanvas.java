@@ -30,6 +30,8 @@ public class MyCanvas extends AWTGLCanvas {
     float rotateY = 0.0f;
     float panX = 0.0f;
     float panY = 0.0f;
+    
+    float time = 0.0f;
 
     public MyCanvas() {
         super();
@@ -57,7 +59,6 @@ public class MyCanvas extends AWTGLCanvas {
         glViewport(0, 0, w, h);
         
         //Following the LeanOpenGL tutorial from https://learnopengl.com
-        //Hello Triangle
         int vertexShader = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertexShader, OpenGLFileReader.loadVertex("simpleshader.vert"));
         glCompileShader(vertexShader);
@@ -104,6 +105,12 @@ public class MyCanvas extends AWTGLCanvas {
         glBindVertexArray(VAO);
         
         glUseProgram(shaderProgram);
+        
+        time += 1f;
+        float greenValue = ((float)Math.sin((double)time)/2.0f) + 0.5f;
+        int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+        
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         

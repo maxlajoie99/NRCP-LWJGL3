@@ -45,7 +45,7 @@ import org.openide.util.NbBundle.Messages;
 public final class LWJGLTopComponent extends TopComponent{
 
     static final Logger LOG = Logger.getLogger(LWJGLTopComponent.class.getName());
-    LWJGLPanel p;
+    private LWJGLPanel p;
     
     public LWJGLTopComponent() {
         initComponents();
@@ -112,7 +112,7 @@ public final class LWJGLTopComponent extends TopComponent{
 
     @Override
     public void componentClosed() {
-        
+
     }
 
     void writeProperties(java.util.Properties p) {

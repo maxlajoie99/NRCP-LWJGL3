@@ -5,11 +5,15 @@
  */
 package ca.cidco.mavenlwjgl;
 
+import ca.cidco.opengl.OpenGLFileReader;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.nio.FloatBuffer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.*;
 import org.lwjgl.opengl.awt.AWTGLCanvas;
 import org.lwjgl.opengl.awt.GLData;
 
@@ -52,6 +56,23 @@ public class MyCanvas extends AWTGLCanvas {
         
         glLoadIdentity();
         glViewport(0, 0, w, h);
+        
+        //Following the LeanOpenGL tutorial from https://learnopengl.com
+        //Hello Triangle
+        int VBO = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER,vertices, GL_STATIC_DRAW);
+        
+        int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(vertexShader, OpenGLFileReader.loadShader("simpleshader.vert"));
+        glCompileShader(vertexShader);
+        
+        int success = glGetShaderi(vertexShader, GL_COMPILE_STATUS);
+        if (success == GL_FALSE){
+            System.out.println(glGetShaderInfoLog(vertexShader));
+        }
+        
+        /* Old code
         glScalef(scale, scale, 1.0f);
         glTranslatef(panX, panY, 0.0f);
         
@@ -64,11 +85,22 @@ public class MyCanvas extends AWTGLCanvas {
                 DrawUtils.drawCube(0.3f, 0.3f, 0.3f);
                 glPopMatrix();
             //}
-        //}
-        
+        //} */
         swapBuffers();
         image = createImage();
     }
+    
+    float[] vertices = {
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        0.0f, 0.5f, 0.0f
+    };
+    
+    
+    
+    
+    
+    
 
     public void zoom(int time) {
         scale += time * -0.025f;
@@ -85,7 +117,21 @@ public class MyCanvas extends AWTGLCanvas {
         panX += x * (1/scale);
         panY += y * (1/scale);
     }
-
+    
+    public void setZoom(float scale){
+        this.scale = scale;
+    }
+    
+    public void setRotation(float x, float y){
+        rotateX = x;
+        rotateY = y;
+    }
+    
+    public void setPanning(float x, float y){
+        panX = x;
+        panY= y;
+    }
+    
     //https://stackoverflow.com/questions/21948804/how-would-i-get-a-bufferedimage-from-an-opengl-window
     public BufferedImage createImage() {
         int width = getWidth();

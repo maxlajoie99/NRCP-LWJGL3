@@ -32,6 +32,7 @@ public class MyCanvas extends AWTGLCanvas {
     float panY = 0.0f;
     
     float time = 0.0f;
+    int FLOAT_SIZE = Float.SIZE/Byte.SIZE;
 
     public MyCanvas() {
         super();
@@ -88,9 +89,10 @@ public class MyCanvas extends AWTGLCanvas {
         glDeleteShader(fragmentShader);
           
         float[] vertices = {
-            -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            0.0f, 0.5f, 0.0f
+            //position          //colors
+            -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+            0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f
         };
         
         int VAO = glGenVertexArrays();
@@ -100,16 +102,21 @@ public class MyCanvas extends AWTGLCanvas {
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
         
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+        //position
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 6 * FLOAT_SIZE, 0);
         glEnableVertexAttribArray(0);
+        //color
+        glVertexAttribPointer(1, 3, GL_FLOAT, false, 6 * FLOAT_SIZE, 3 * FLOAT_SIZE);
+        glEnableVertexAttribArray(1);
         glBindVertexArray(VAO);
         
         glUseProgram(shaderProgram);
         
+        /* Uniform
         time += 1f;
         float greenValue = ((float)Math.sin((double)time)/2.0f) + 0.5f;
         int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);*/
         
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);

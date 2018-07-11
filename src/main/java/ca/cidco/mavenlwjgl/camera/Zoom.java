@@ -5,6 +5,7 @@
  */
 package ca.cidco.mavenlwjgl.camera;
 
+import ca.cidco.mavenlwjgl.LWJGLPanel;
 import ca.cidco.mavenlwjgl.LWJGLTopComponent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
@@ -17,9 +18,16 @@ public class Zoom implements MouseWheelListener{
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        LWJGLTopComponent tc = (LWJGLTopComponent)e.getSource();
-        tc.getPanel().getCanvas().zoom(e.getWheelRotation());
-        tc.repaint();
+        if (e.getSource() instanceof LWJGLTopComponent){
+            LWJGLTopComponent tc = (LWJGLTopComponent)e.getSource();
+            tc.getPanel().getCanvas().zoom(e.getWheelRotation());
+            tc.repaint();
+        }
+        else if (e.getSource() instanceof LWJGLPanel) {
+            LWJGLPanel p = (LWJGLPanel)e.getSource();
+            p.getCanvas().zoom(e.getWheelRotation());
+            p.repaint();
+        }
     }
     
 }

@@ -13,41 +13,40 @@ import java.awt.event.MouseMotionListener;
  *
  * @author mlajoie
  */
-public class Rotate implements MouseMotionListener{
+public class Panning implements MouseMotionListener {
 
     Integer lastX = null;
     Integer lastY = null;
     
-    private final float ANGLE = 360f;
-    
     @Override
     public void mouseDragged(MouseEvent e) {
-        if (e.getSource() instanceof LWJGLTopComponent  && e.getModifiersEx() == MouseEvent.BUTTON1_DOWN_MASK){
-            LWJGLTopComponent tc = (LWJGLTopComponent)e.getSource();
-
-            if (lastX != null && lastY != null){
-                float angleX = 0.0f;
-                float angleY = 0.0f;
+        if (e.getModifiersEx() == MouseEvent.BUTTON1_DOWN_MASK + MouseEvent.CTRL_DOWN_MASK){
+            if (e.getSource() instanceof LWJGLTopComponent){
+                
+                LWJGLTopComponent tc = (LWJGLTopComponent)e.getSource();
+                
+                float panX = 0.0f;
+                float panY = 0.0f;
                 
                 int currentX = e.getX();
                 int currentY = e.getY();
                 int width = tc.getWidth();
                 int height = tc.getHeight();
                 
-                angleY = -(currentX-lastX)/(float)width * ANGLE;
-                angleX = -(currentY-lastY)/(float)height * ANGLE;
-
-                tc.getPanel().getCanvas().rotate(angleX, angleY);
+                panX = (currentX-lastX)/(float)width;
+                panY = -(currentY-lastY)/(float)height;
+                
+                lastX = e.getX();
+                lastY = e.getY();
+                
+                tc.getPanel().getCanvas().panning(panX, panY);
+                tc.repaint();
             }
-
-            lastX = e.getX();
-            lastY = e.getY();
-            tc.repaint();
         }
     }
 
     @Override
-    public void mouseMoved(MouseEvent e) {
+    public void mouseMoved(MouseEvent e) { 
         lastX = e.getX();
         lastY = e.getY();
     }

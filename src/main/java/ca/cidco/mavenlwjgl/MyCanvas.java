@@ -24,6 +24,8 @@ public class MyCanvas extends AWTGLCanvas {
     float scale = 1.0f;
     float rotateX = 0.0f;
     float rotateY = 0.0f;
+    float panX = 0.0f;
+    float panY = 0.0f;
 
     public MyCanvas() {
         super();
@@ -51,18 +53,18 @@ public class MyCanvas extends AWTGLCanvas {
         glLoadIdentity();
         glViewport(0, 0, w, h);
         glScalef(scale, scale, 1.0f);
+        glTranslatef(panX, panY, 0.0f);
         
-        glRotatef(rotateX, 1.0f, 0.0f, 0.0f);
-        glRotatef(rotateY, 0.0f, 1.0f, 0.0f);
-        
-        for (int i = -500; i < 501; i++) {
-            for (int j = -500; j < 501; j++) {
+        //for (float i = -250.0f; i < 250.0f; i+=0.5f) {
+            //for (float j = -250.0f; j < 250.0f; j+=0.5f) {
                 glPushMatrix();
-                glTranslatef(i, j, 0.0f);
-                DrawUtils.drawCube(0.5f, 0.5f, 0.5f);
+                //glTranslatef(i, j, 0.0f);
+                glRotatef(rotateX, 1.0f, 0.0f, 0.0f);
+                glRotatef(rotateY, 0.0f, 1.0f, 0.0f);
+                DrawUtils.drawCube(0.3f, 0.3f, 0.3f);
                 glPopMatrix();
-            }
-        }
+            //}
+        //}
         
         swapBuffers();
         image = createImage();
@@ -77,6 +79,11 @@ public class MyCanvas extends AWTGLCanvas {
     public void rotate(float angleX, float angleY){
         rotateX += angleX;
         rotateY += angleY;
+    }
+    
+    public void panning(float x, float y){
+        panX += x * (1/scale);
+        panY += y * (1/scale);
     }
 
     //https://stackoverflow.com/questions/21948804/how-would-i-get-a-bufferedimage-from-an-opengl-window

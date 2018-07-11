@@ -74,6 +74,14 @@ public class MyCanvas extends AWTGLCanvas {
             System.out.println(glGetShaderInfoLog(fragmentShader));
         }
         
+        int fragmentShader2 = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fragmentShader2, OpenGLFileReader.loadFragment("simpleshader2.frag"));
+        glCompileShader(fragmentShader2);
+        success = glGetShaderi(fragmentShader2, GL_COMPILE_STATUS);
+        if (success == GL_FALSE){
+            System.out.println(glGetShaderInfoLog(fragmentShader2));
+        }
+        
         int shaderProgram = glCreateProgram();
         glAttachShader(shaderProgram, vertexShader);
         glAttachShader(shaderProgram, fragmentShader);
@@ -83,8 +91,18 @@ public class MyCanvas extends AWTGLCanvas {
             System.out.println(glGetProgramInfoLog(shaderProgram));
         }
         
+        int shaderProgram2 = glCreateProgram();
+        glAttachShader(shaderProgram2, vertexShader);
+        glAttachShader(shaderProgram2, fragmentShader2);
+        glLinkProgram(shaderProgram2);
+        success = glGetProgrami(shaderProgram2, GL_LINK_STATUS);
+        if (success == GL_FALSE){
+            System.out.println(glGetProgramInfoLog(shaderProgram2));
+        }
+        
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
+        glDeleteShader(fragmentShader2);
           
         float[][] vertices = {
             {
@@ -123,6 +141,8 @@ public class MyCanvas extends AWTGLCanvas {
         glUseProgram(shaderProgram);
         glBindVertexArray(VAOs[0]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
+        
+        glUseProgram(shaderProgram2);
         glBindVertexArray(VAOs[1]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         

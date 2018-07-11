@@ -21,7 +21,7 @@ public class OpenGLFileReader {
         StringBuilder shaderSource = new StringBuilder();
 
         try {
-            InputStream inputStream = OpenGLFileReader.class.getResourceAsStream("ca/cidco/opengl/" + filename);
+            InputStream inputStream = OpenGLFileReader.class.getResourceAsStream("shaders/" + filename);
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             String line;
             while ((line = reader.readLine()) != null) {

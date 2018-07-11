@@ -118,6 +118,8 @@ public class MyCanvas extends AWTGLCanvas {
         int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
         glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);*/
         
+        glUniform1f(glGetUniformLocation(shaderProgram, "horizontalOffset"), 0.5f);
+        
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         

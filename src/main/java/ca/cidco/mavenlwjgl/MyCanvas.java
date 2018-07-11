@@ -87,25 +87,41 @@ public class MyCanvas extends AWTGLCanvas {
         glDeleteShader(fragmentShader);
           
         float[] vertices = {
-            -0.5f, -0.5f, 0.0f,
+            0.5f, 0.5f, 0.0f,
             0.5f, -0.5f, 0.0f,
-            0.0f, 0.5f, 0.0f
+            -0.5f, -0.5f, 0.0f,
+            -0.5f, 0.5f, 0.0f
         };
         
+        int[] indices = {
+            0,1,3,
+            1,2,3
+        };
+        
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        
         int VAO = glGenVertexArrays();
+        int VBO = glGenBuffers();
+        int EBO = glGenBuffers();
+        
         glBindVertexArray(VAO);
         
-        int VBO = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
         
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
+        
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
         glEnableVertexAttribArray(0);
-        glBindVertexArray(VAO);
+        
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
         
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        
         
         /* Old code
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -12,6 +12,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.logging.Logger;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
@@ -95,6 +97,14 @@ public final class LWJGLTopComponent extends TopComponent{
             public void mouseMoved(MouseEvent e) {
                 lastX = e.getX();
                 lastY = e.getY();
+            }
+        });
+        
+        this.addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                getPanel().getCanvas().zoom(e.getWheelRotation() * 1.0f);
+                repaint();
             }
         });
         

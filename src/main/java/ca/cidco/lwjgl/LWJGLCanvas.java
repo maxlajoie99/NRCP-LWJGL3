@@ -41,6 +41,8 @@ public class LWJGLCanvas extends AWTGLCanvas {
     
     float pitch = 0.0f;
     float yaw = 0.0f;
+    
+    float fov = 45.0f;
 
     public LWJGLCanvas() {
         super();
@@ -185,7 +187,7 @@ public class LWJGLCanvas extends AWTGLCanvas {
         }
 
         Matrix4f model = Matrix4f.rotate(50.0f * (new Random()).nextInt(360), 0.5f, 1.0f, 0.0f);
-        Matrix4f projection = Matrix4f.perspective(45.0f, aspect, 0.1f, 100f);
+        Matrix4f projection = Matrix4f.perspective(fov, aspect, 0.1f, 100f);
            
         Matrix4f view = Matrix4f.lookAt(camPos, camPos.add(camFront), camUp);
         
@@ -238,6 +240,15 @@ public class LWJGLCanvas extends AWTGLCanvas {
         front.y = (float)Math.sin(Math.toRadians(pitch));
         front.z = (float)Math.cos(Math.toRadians(pitch)) * (float)Math.sin(Math.toRadians(yaw));
         camFront = front.normalize();
+    }
+    
+    public void zoom(float y){
+        if (fov >= 1.0f && fov <= 55.0f)
+            fov += y;
+        if (fov <= 1.0f)
+            fov = 1.0f;
+        if (fov >= 55.0f)
+            fov = 55.0f;
     }
     
     //https://stackoverflow.com/questions/21948804/how-would-i-get-a-bufferedimage-from-an-opengl-window

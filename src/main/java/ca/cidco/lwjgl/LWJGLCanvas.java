@@ -5,8 +5,10 @@
  */
 package ca.cidco.lwjgl;
 
+import ca.cidco.opengl.ImageReader;
 import ca.cidco.opengl.ShaderReader;
 import java.awt.image.BufferedImage;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL;
@@ -17,6 +19,7 @@ import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 import org.lwjgl.opengl.awt.AWTGLCanvas;
 import org.lwjgl.opengl.awt.GLData;
+import static org.lwjgl.stb.STBImage.*;
 
 /**
  *
@@ -117,6 +120,10 @@ public class LWJGLCanvas extends AWTGLCanvas {
             1.0f, 0.0f,
             0.5f, 1.0f
         };
+
+        //Generating texture
+        int texture = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, texture);
         
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
@@ -128,7 +135,20 @@ public class LWJGLCanvas extends AWTGLCanvas {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);      //Scaling down using Mipmapping
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);       //Scaling up (Don't use mipmap, useless + error)
         
+        //Load image
+        int[] width = new int[1],
+            height = new int[1],
+            nrChannels = new int[1];
+        ByteBuffer data = stbi_load(ImageReader.getImagePath("container.jpg"), width, height, nrChannels, 0);
+        if (data != null){
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width[0], height[0], 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+        else{
+            System.out.println("Failed to load texture");
+        }
         
+        stbi_image_free(data);  //Free the image memory
         
         
         glUseProgram(shaderProgram);  

@@ -6,6 +6,7 @@
 package ca.cidco.lwjgl;
 
 import ca.cidco.opengl.ImageReader;
+import ca.cidco.opengl.Shader;
 import ca.cidco.opengl.ShaderReader;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
@@ -64,41 +65,21 @@ public class LWJGLCanvas extends AWTGLCanvas {
         glViewport(0, 0, w, h);
         
         //Following the LeanOpenGL tutorial from https://learnopengl.com
-        int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertexShader, ShaderReader.loadVertex("simpleshader.vert"));
-        glCompileShader(vertexShader);
-        int success = glGetShaderi(vertexShader, GL_COMPILE_STATUS);
-        if (success == GL_FALSE){
-            System.out.println(glGetShaderInfoLog(vertexShader));
-        }
-        
-        int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragmentShader, ShaderReader.loadFragment("simpleshader.frag"));
-        glCompileShader(fragmentShader);
-        success = glGetShaderi(fragmentShader, GL_COMPILE_STATUS);
-        if (success == GL_FALSE){
-            System.out.println(glGetShaderInfoLog(fragmentShader));
-        }
-        
-        int shaderProgram = glCreateProgram();
-        glAttachShader(shaderProgram, vertexShader);
-        glAttachShader(shaderProgram, fragmentShader);
-        glLinkProgram(shaderProgram);
-        success = glGetProgrami(shaderProgram, GL_LINK_STATUS);
-        if (success == GL_FALSE){
-            System.out.println(glGetProgramInfoLog(shaderProgram));
-        }
-        
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
+        Shader shader = new Shader("simpleshader.vs", "simpleshader.fs");
           
-        float[] vertices = {
-            //position          //colors
-            -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-            0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f
+        float vertices[] = {
+            // positions          // colors           // texture coords
+             0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,  1.0f, 1.0f,   // top right
+             0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,  1.0f, 0.0f,   // bottom right
+            -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,  0.0f, 0.0f,   // bottom left
+            -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,  0.0f, 1.0f    // top left 
         };
         
+        int indices[] = {  // note that we start from 0!
+            0, 1, 3,   // first triangle
+            1, 2, 3    // second triangle
+        };  
+                
         int VAO = glGenVertexArrays();
         glBindVertexArray(VAO);
         
@@ -106,20 +87,19 @@ public class LWJGLCanvas extends AWTGLCanvas {
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
         
+        int EBO = glGenBuffers();
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
+        
         //position
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 6 * FLOAT_SIZE, 0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * FLOAT_SIZE, 0);
         glEnableVertexAttribArray(0);
         //color
-        glVertexAttribPointer(1, 3, GL_FLOAT, false, 6 * FLOAT_SIZE, 3 * FLOAT_SIZE);
+        glVertexAttribPointer(1, 3, GL_FLOAT, false, 8 * FLOAT_SIZE, 3 * FLOAT_SIZE);
         glEnableVertexAttribArray(1);
-        glBindVertexArray(VAO);
-        
-        //Textures
-        float[] texCoords = {
-            0,0f, 0,0f,
-            1.0f, 0.0f,
-            0.5f, 1.0f
-        };
+        //texture
+        glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * FLOAT_SIZE, 6 * FLOAT_SIZE);
+        glEnableVertexAttribArray(2);
 
         //Generating texture
         int texture = glGenTextures();
@@ -137,23 +117,21 @@ public class LWJGLCanvas extends AWTGLCanvas {
         
         //Load image
         int[] width = new int[1],
-            height = new int[1],
-            nrChannels = new int[1];
-        ByteBuffer data = stbi_load(ImageReader.getImagePath("container.jpg"), width, height, nrChannels, 0);
+            height = new int[1];
+
+        ByteBuffer data = ImageReader.loadImage("container.jpg",width, height);
         if (data != null){
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width[0], height[0], 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width[0], height[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
             glGenerateMipmap(GL_TEXTURE_2D);
         }
         else{
             System.out.println("Failed to load texture");
         }
         
-        stbi_image_free(data);  //Free the image memory
-        
-        
-        glUseProgram(shaderProgram);  
+        shader.use();
+        glBindTexture(GL_TEXTURE_2D, texture);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         
         /* Old code
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

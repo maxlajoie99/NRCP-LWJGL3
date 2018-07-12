@@ -156,6 +156,11 @@ public class LWJGLCanvas extends AWTGLCanvas {
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         
+        trans = Matrix4f.translate(-0.5f, 0.5f, 0.0f);
+        trans = trans.multiply(Matrix4f.rotate(180.0f, 0.0f, 0.0f, 1.0f));
+        trans = trans.multiply(Matrix4f.scale(0.25f, 0.25f, 0.25f));
+        shader.setMatrix4f("transform", trans);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         
         swapBuffers();
         image = createImage();

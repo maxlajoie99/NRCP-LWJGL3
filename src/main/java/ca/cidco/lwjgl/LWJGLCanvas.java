@@ -151,6 +151,7 @@ public class LWJGLCanvas extends AWTGLCanvas {
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         
         
+        
         swapBuffers();
         image = createImage();
     }

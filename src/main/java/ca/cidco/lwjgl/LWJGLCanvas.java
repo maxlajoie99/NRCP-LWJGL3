@@ -138,9 +138,14 @@ public class LWJGLCanvas extends AWTGLCanvas {
         }
         
         //Transformations
-        Matrix4f trans = Matrix4f.translate(0.5f, -0.5f, 0.0f);
-        trans = trans.multiply(Matrix4f.rotate(90.0f, 0.0f, 0.0f, 1.0f));
+        Matrix4f trans = Matrix4f.rotate(90.0f, 0.0f, 0.0f, 1.0f);
+        trans = trans.multiply(Matrix4f.translate(0.5f, -0.5f, 0.0f));
         trans = trans.multiply(Matrix4f.scale(0.5f, 0.5f, 0.5f));
+        /* Why does this happen?
+         * La rotation ne s'effectue pas autour de l'origine de l'image
+         * puisque celle-ci est translatée avant. La rotation s'effectue donc
+         * à partir de ce qui semble être le centre de la scène.
+         */
         
         shader.use();
         shader.setInt("texture1", 0);

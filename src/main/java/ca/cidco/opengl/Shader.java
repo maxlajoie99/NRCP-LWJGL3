@@ -5,7 +5,9 @@
  */
 package ca.cidco.opengl;
 
-import ca.cidco.opengl.ShaderReader;
+import ca.cidco.math.Matrix4f;
+import java.nio.FloatBuffer;
+import org.lwjgl.BufferUtils;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
 
@@ -64,6 +66,12 @@ public class Shader {
     
     public void setFloat(String name, float value){
         glUniform1f(glGetUniformLocation(ID, name), value);
+    }
+    
+    public void setMatrix4f(String name, Matrix4f mat4){
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
+        mat4.toBuffer(buffer);
+        glUniformMatrix4fv(glGetUniformLocation(ID, name), false, buffer);
     }
     
 }

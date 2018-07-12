@@ -5,6 +5,7 @@
  */
 package ca.cidco.lwjgl;
 
+import ca.cidco.math.*;
 import ca.cidco.opengl.ImageReader;
 import ca.cidco.opengl.Shader;
 import java.awt.image.BufferedImage;
@@ -71,7 +72,7 @@ public class LWJGLCanvas extends AWTGLCanvas {
             0, 1, 3,   // first triangle
             1, 2, 3    // second triangle
         };  
-                
+            
         int VAO = glGenVertexArrays();
         glBindVertexArray(VAO);
         
@@ -136,20 +137,24 @@ public class LWJGLCanvas extends AWTGLCanvas {
             System.out.println("Failed to load texture");
         }
         
+        //Transformations
+        Matrix4f trans = Matrix4f.translate(0.5f, -0.5f, 0.0f);
+        trans = trans.multiply(Matrix4f.rotate(90.0f, 0.0f, 0.0f, 1.0f));
+        trans = trans.multiply(Matrix4f.scale(0.5f, 0.5f, 0.5f));
+        
         shader.use();
         shader.setInt("texture1", 0);
         shader.setInt("texture2", 1);
+        shader.setMatrix4f("transform", trans);
         
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
         
-        
         shader.use();
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        
         
         
         swapBuffers();

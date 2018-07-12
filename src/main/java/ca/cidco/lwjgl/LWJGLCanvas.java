@@ -11,6 +11,7 @@ import java.nio.FloatBuffer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL14.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
@@ -110,14 +111,27 @@ public class LWJGLCanvas extends AWTGLCanvas {
         glEnableVertexAttribArray(1);
         glBindVertexArray(VAO);
         
-        glUseProgram(shaderProgram);
+        //Textures
+        float[] texCoords = {
+            0,0f, 0,0f,
+            1.0f, 0.0f,
+            0.5f, 1.0f
+        };
         
-        /* Uniform
-        time += 1f;
-        float greenValue = ((float)Math.sin((double)time)/2.0f) + 0.5f;
-        int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);*/
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+        //If using GL_CLAMP_TO_BORDER
+        //float borderColor[] = {1.0f, 1.0f, 0.0f, 1.0f};
+        //glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER, borderColor);
         
+        //Texture filtering
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);      //Scaling down
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);       //Scaling up
+        
+        
+        
+        
+        glUseProgram(shaderProgram);  
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         

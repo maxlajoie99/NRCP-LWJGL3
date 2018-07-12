@@ -8,6 +8,8 @@ package ca.cidco.lwjgl;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
@@ -57,6 +59,16 @@ public final class LWJGLTopComponent extends TopComponent{
         
         this.setVisible(true);
         this.transferFocus();
+        
+        this.setFocusable(true);
+        this.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e){
+                System.out.println(e.getKeyCode());
+                getPanel().getCanvas().moveCamera(e.getKeyCode());
+                repaint();
+            }
+        });
         
         p.setVisible(false);
     }

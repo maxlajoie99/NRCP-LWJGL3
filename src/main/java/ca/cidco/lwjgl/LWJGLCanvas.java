@@ -8,6 +8,7 @@ package ca.cidco.lwjgl;
 import ca.cidco.math.*;
 import ca.cidco.opengl.ImageReader;
 import ca.cidco.opengl.Shader;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -32,7 +33,11 @@ public class LWJGLCanvas extends AWTGLCanvas {
     BufferedImage image;
 
     int FLOAT_SIZE = Float.SIZE/Byte.SIZE;
-    float time = 0.0f;
+   
+    //Camera/View Space
+    Vector3f camPos = new Vector3f(0.0f, 0.0f, 3.0f);
+    Vector3f camFront = new Vector3f(0.0f, 0.0f, -1.0f);
+    Vector3f camUp = new Vector3f(0.0f, 1.0f, 0.0f);
 
     public LWJGLCanvas() {
         super();
@@ -177,20 +182,9 @@ public class LWJGLCanvas extends AWTGLCanvas {
         }
 
         Matrix4f model = Matrix4f.rotate(50.0f * (new Random()).nextInt(360), 0.5f, 1.0f, 0.0f);
-        Matrix4f view = Matrix4f.translate(0.0f, 0.0f, -3.0f);
         Matrix4f projection = Matrix4f.perspective(45.0f, aspect, 0.1f, 100f);
-        
-        //Camera/View Space
-        Vector3f camPos = new Vector3f(0.0f, 0.0f, 3.0f);
-        Vector3f camTarget = new Vector3f(0.0f, 0.0f, 0.0f);
-        Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f);
-        
-        //Look At
-        time += 0.1f;
-        float radius = 10.0f;
-        float camX = (float)Math.sin(time) * radius;
-        float camZ = (float)Math.cos(time) * radius;
-        view = Matrix4f.lookAt(new Vector3f(camX, 0.0f, camZ), camTarget, up);
+           
+        Matrix4f view = Matrix4f.lookAt(camPos, camPos.add(camFront), camUp);
         
         shader.use();
         shader.setInt("texture1", 0);
@@ -218,6 +212,18 @@ public class LWJGLCanvas extends AWTGLCanvas {
         
         swapBuffers();
         image = createImage();
+    }
+    
+    public void moveCamera(int keyCode){
+        float camSpeed = 0.05f;
+        if (keyCode == KeyEvent.VK_W)
+            camPos = camPos.add(camFront.scale(camSpeed));
+        if (keyCode == KeyEvent.VK_S)
+            camPos = camPos.subtract(camFront.scale(camSpeed));
+        if (keyCode == KeyEvent.VK_A)
+            camPos = camPos.subtract(camFront.cross(camUp).normalize().scale(camSpeed));
+        if (keyCode == KeyEvent.VK_D)
+            camPos = camPos.add(camFront.cross(camUp).normalize().scale(camSpeed));
     }
     
     //https://stackoverflow.com/questions/21948804/how-would-i-get-a-bufferedimage-from-an-opengl-window

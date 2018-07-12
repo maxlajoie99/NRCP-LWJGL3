@@ -195,8 +195,11 @@ public class LWJGLCanvas extends AWTGLCanvas {
         glBindVertexArray(VAO);
         for (int i = 0; i < cubePositions.length; i++) {
             model = Matrix4f.translate(cubePositions[i].x, cubePositions[i].y, cubePositions[i].z);
-            model = model.multiply(Matrix4f.rotate(50.0f * i, 1.0f, 0.3f, 0.5f));
+            float angle = 50.0f * i;
+            if (i % 3 == 0)
+                angle = 15.0f * (new Random()).nextInt(360);
             
+            model = model.multiply(Matrix4f.rotate(angle, 1.0f, 0.3f, 0.5f));
             shader.setMatrix4f("model", model);
             
             glDrawArrays(GL_TRIANGLES, 0, 36);

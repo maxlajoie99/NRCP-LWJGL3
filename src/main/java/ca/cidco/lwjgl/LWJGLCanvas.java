@@ -28,14 +28,7 @@ import org.lwjgl.opengl.awt.GLData;
 public class LWJGLCanvas extends AWTGLCanvas {
 
     BufferedImage image;
-    
-    float scale = 1.0f;
-    float rotateX = 0.0f;
-    float rotateY = 0.0f;
-    float panX = 0.0f;
-    float panY = 0.0f;
-    
-    float time = 0.0f;
+
     int FLOAT_SIZE = Float.SIZE/Byte.SIZE;
 
     public LWJGLCanvas() {
@@ -157,58 +150,9 @@ public class LWJGLCanvas extends AWTGLCanvas {
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         
-        /* Old code
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        glLoadIdentity();
-        glViewport(0, 0, w, h);
-        
-        glScalef(scale, scale, 1.0f);
-        glTranslatef(panX, panY, 0.0f);
-        
-        //for (float i = -250.0f; i < 250.0f; i+=0.5f) {
-            //for (float j = -250.0f; j < 250.0f; j+=0.5f) {
-                glPushMatrix();
-                //glTranslatef(i, j, 0.0f);
-                glRotatef(rotateX, 1.0f, 0.0f, 0.0f);
-                glRotatef(rotateY, 0.0f, 1.0f, 0.0f);
-                DrawUtils.drawCube(0.3f, 0.3f, 0.3f);
-                glPopMatrix();
-            //}
-        //} */
         swapBuffers();
         image = createImage();
-    }
-
- 
-    public void zoom(int time) {
-        scale += time * -0.025f;
-        if (scale <= 0.0f)
-            scale = 0.0f;
-    }
-    
-    public void rotate(float angleX, float angleY){
-        rotateX += angleX;
-        rotateY += angleY;
-    }
-    
-    public void panning(float x, float y){
-        panX += x * (1/scale);
-        panY += y * (1/scale);
-    }
-    
-    public void setZoom(float scale){
-        this.scale = scale;
-    }
-    
-    public void setRotation(float x, float y){
-        rotateX = x;
-        rotateY = y;
-    }
-    
-    public void setPanning(float x, float y){
-        panX = x;
-        panY= y;
     }
     
     //https://stackoverflow.com/questions/21948804/how-would-i-get-a-bufferedimage-from-an-opengl-window

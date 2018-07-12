@@ -5,9 +5,6 @@
  */
 package ca.cidco.lwjgl;
 
-import ca.cidco.lwjgl.camera.Panning;
-import ca.cidco.lwjgl.camera.Rotate;
-import ca.cidco.lwjgl.camera.Zoom;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -60,10 +57,6 @@ public final class LWJGLTopComponent extends TopComponent{
         
         this.setVisible(true);
         this.transferFocus();
-        
-        this.addMouseWheelListener(new Zoom());
-        this.addMouseMotionListener(new Rotate());
-        this.addMouseMotionListener(new Panning());
         
         p.setVisible(false);
     }

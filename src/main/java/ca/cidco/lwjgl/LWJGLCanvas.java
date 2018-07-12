@@ -7,20 +7,19 @@ package ca.cidco.lwjgl;
 
 import ca.cidco.opengl.ImageReader;
 import ca.cidco.opengl.Shader;
-import ca.cidco.opengl.ShaderReader;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL14.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 import org.lwjgl.opengl.awt.AWTGLCanvas;
 import org.lwjgl.opengl.awt.GLData;
-import static org.lwjgl.stb.STBImage.*;
 
 /**
  *
@@ -102,8 +101,8 @@ public class LWJGLCanvas extends AWTGLCanvas {
         glEnableVertexAttribArray(2);
 
         //Generating texture
-        int texture = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, texture);
+        int texture1 = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, texture1);
         
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
@@ -128,8 +127,33 @@ public class LWJGLCanvas extends AWTGLCanvas {
             System.out.println("Failed to load texture");
         }
         
+        int texture2 = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, texture2);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);    
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);    
+        
+        data = ImageReader.loadImage("awesomeface.png",width, height);
+        if (data != null){
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width[0], height[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+        else{
+            System.out.println("Failed to load texture");
+        }
+        
         shader.use();
-        glBindTexture(GL_TEXTURE_2D, texture);
+        shader.setInt("texture1", 0);
+        shader.setInt("texture2", 1);
+        
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture2);
+        
+        
+        shader.use();
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         

@@ -6,7 +6,6 @@
 package ca.cidco.opengl;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -15,13 +14,13 @@ import java.io.InputStreamReader;
  *
  * @author mlajoie
  */
-public class OpenGLFileReader {
+public class ShaderReader {
 
     public static StringBuilder loadVertex(String filename) {
         StringBuilder shaderSource = new StringBuilder();
 
         try {
-            InputStream inputStream = OpenGLFileReader.class.getResourceAsStream("shaders/vertex/" + filename);
+            InputStream inputStream = ShaderReader.class.getResourceAsStream("shaders/vertex/" + filename);
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             String line;
             while ((line = reader.readLine()) != null) {
@@ -39,7 +38,7 @@ public class OpenGLFileReader {
         StringBuilder shaderSource = new StringBuilder();
 
         try {
-            InputStream inputStream = OpenGLFileReader.class.getResourceAsStream("shaders/fragment/" + filename);
+            InputStream inputStream = ShaderReader.class.getResourceAsStream("shaders/fragment/" + filename);
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             String line;
             while ((line = reader.readLine()) != null) {

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ca.cidco.mavenlwjgl;
+package ca.cidco.lwjgl;
 
 import static org.lwjgl.opengl.GL11.*;
 

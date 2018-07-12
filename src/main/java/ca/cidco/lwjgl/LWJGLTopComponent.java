@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ca.cidco.mavenlwjgl;
+package ca.cidco.lwjgl;
 
-import ca.cidco.mavenlwjgl.camera.Panning;
-import ca.cidco.mavenlwjgl.camera.Rotate;
-import ca.cidco.mavenlwjgl.camera.Zoom;
+import ca.cidco.lwjgl.camera.Panning;
+import ca.cidco.lwjgl.camera.Rotate;
+import ca.cidco.lwjgl.camera.Zoom;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;

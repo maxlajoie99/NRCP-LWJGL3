@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ca.cidco.mavenlwjgl;
+package ca.cidco.lwjgl;
 
-import ca.cidco.opengl.OpenGLFileReader;
+import ca.cidco.opengl.ShaderReader;
 import java.awt.image.BufferedImage;
 import java.nio.FloatBuffer;
 import org.lwjgl.BufferUtils;
@@ -21,7 +21,7 @@ import org.lwjgl.opengl.awt.GLData;
  *
  * @author mlajoie
  */
-public class MyCanvas extends AWTGLCanvas {
+public class LWJGLCanvas extends AWTGLCanvas {
 
     BufferedImage image;
     
@@ -34,11 +34,11 @@ public class MyCanvas extends AWTGLCanvas {
     float time = 0.0f;
     int FLOAT_SIZE = Float.SIZE/Byte.SIZE;
 
-    public MyCanvas() {
+    public LWJGLCanvas() {
         super();
     }
 
-    public MyCanvas(GLData data) {
+    public LWJGLCanvas(GLData data) {
         super(data);
     }
 
@@ -61,7 +61,7 @@ public class MyCanvas extends AWTGLCanvas {
         
         //Following the LeanOpenGL tutorial from https://learnopengl.com
         int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertexShader, OpenGLFileReader.loadVertex("simpleshader.vert"));
+        glShaderSource(vertexShader, ShaderReader.loadVertex("simpleshader.vert"));
         glCompileShader(vertexShader);
         int success = glGetShaderi(vertexShader, GL_COMPILE_STATUS);
         if (success == GL_FALSE){
@@ -69,7 +69,7 @@ public class MyCanvas extends AWTGLCanvas {
         }
         
         int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragmentShader, OpenGLFileReader.loadFragment("simpleshader.frag"));
+        glShaderSource(fragmentShader, ShaderReader.loadFragment("simpleshader.frag"));
         glCompileShader(fragmentShader);
         success = glGetShaderi(fragmentShader, GL_COMPILE_STATUS);
         if (success == GL_FALSE){

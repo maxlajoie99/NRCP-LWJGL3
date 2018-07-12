@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ca.cidco.mavenlwjgl;
+package ca.cidco.opengl;
 
-import ca.cidco.opengl.OpenGLFileReader;
+import ca.cidco.opengl.ShaderReader;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
 
@@ -22,7 +22,7 @@ public class Shader {
         int fragment;
         
         vertex = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertex, OpenGLFileReader.loadVertex(vertexFile));
+        glShaderSource(vertex, ShaderReader.loadVertex(vertexFile));
         glCompileShader(vertex);
         int success = glGetShaderi(vertex, GL_COMPILE_STATUS);
         if (success == GL_FALSE){
@@ -30,7 +30,7 @@ public class Shader {
         }
         
         fragment = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragment, OpenGLFileReader.loadFragment(fragmentFile));
+        glShaderSource(fragment, ShaderReader.loadFragment(fragmentFile));
         glCompileShader(fragment);
         success = glGetShaderi(fragment, GL_COMPILE_STATUS);
         if (success == GL_FALSE){

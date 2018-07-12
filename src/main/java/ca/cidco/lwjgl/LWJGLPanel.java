@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ca.cidco.mavenlwjgl;
+package ca.cidco.lwjgl;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -18,7 +18,7 @@ import org.lwjgl.opengl.awt.GLData;
  */
 public class LWJGLPanel extends JPanel {
 
-    private MyCanvas canvas;
+    private LWJGLCanvas canvas;
     private GLData data;
    
     static final Logger LOG = Logger.getLogger(LWJGLPanel.class.getName());
@@ -33,11 +33,11 @@ public class LWJGLPanel extends JPanel {
         setMinimumSize(new Dimension(0, 0));
         data = new GLData();
         data.samples = 4;
-        canvas = new MyCanvas(data);
+        canvas = new LWJGLCanvas(data);
         add(canvas, BorderLayout.CENTER);
     }
     
-    public MyCanvas getCanvas(){
+    public LWJGLCanvas getCanvas(){
         return canvas;
     }
     

@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ca.cidco.mavenlwjgl.camera;
+package ca.cidco.lwjgl.camera;
 
-import ca.cidco.mavenlwjgl.LWJGLPanel;
-import ca.cidco.mavenlwjgl.LWJGLTopComponent;
+import ca.cidco.lwjgl.LWJGLPanel;
+import ca.cidco.lwjgl.LWJGLTopComponent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 

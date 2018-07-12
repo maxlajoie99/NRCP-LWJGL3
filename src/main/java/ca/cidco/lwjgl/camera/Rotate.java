@@ -37,7 +37,7 @@ public class Rotate implements MouseMotionListener{
                 angleY = -(currentX-lastX)/(float)width * ANGLE;
                 angleX = -(currentY-lastY)/(float)height * ANGLE;
 
-                tc.getPanel().getCanvas().rotate(angleX, angleY);
+                //tc.getPanel().getCanvas().rotate(angleX, angleY);
             }
 
             lastX = e.getX();

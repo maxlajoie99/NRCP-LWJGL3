@@ -20,12 +20,12 @@ public class Zoom implements MouseWheelListener{
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (e.getSource() instanceof LWJGLTopComponent){
             LWJGLTopComponent tc = (LWJGLTopComponent)e.getSource();
-            tc.getPanel().getCanvas().zoom(e.getWheelRotation());
+            //tc.getPanel().getCanvas().zoom(e.getWheelRotation());
             tc.repaint();
         }
         else if (e.getSource() instanceof LWJGLPanel) {
             LWJGLPanel p = (LWJGLPanel)e.getSource();
-            p.getCanvas().zoom(e.getWheelRotation());
+            //p.getCanvas().zoom(e.getWheelRotation());
             p.repaint();
         }
     }

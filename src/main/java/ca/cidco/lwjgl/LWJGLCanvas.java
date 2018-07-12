@@ -37,6 +37,7 @@ public class LWJGLCanvas extends AWTGLCanvas {
     
     float time = 0.0f;
     int FLOAT_SIZE = Float.SIZE/Byte.SIZE;
+    float mixTextures = 0.0f;
 
     public LWJGLCanvas() {
         super();
@@ -146,6 +147,7 @@ public class LWJGLCanvas extends AWTGLCanvas {
         shader.use();
         shader.setInt("texture1", 0);
         shader.setInt("texture2", 1);
+        shader.setFloat("mixTextures", mixTextures);
         
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
@@ -180,36 +182,13 @@ public class LWJGLCanvas extends AWTGLCanvas {
         image = createImage();
     }
 
- 
-    public void zoom(int time) {
-        scale += time * -0.025f;
-        if (scale <= 0.0f)
-            scale = 0.0f;
-    }
-    
-    public void rotate(float angleX, float angleY){
-        rotateX += angleX;
-        rotateY += angleY;
-    }
-    
-    public void panning(float x, float y){
-        panX += x * (1/scale);
-        panY += y * (1/scale);
-    }
-    
-    public void setZoom(float scale){
-        this.scale = scale;
-    }
-    
-    public void setRotation(float x, float y){
-        rotateX = x;
-        rotateY = y;
-    }
-    
-    public void setPanning(float x, float y){
-        panX = x;
-        panY= y;
-    }
+    public void mix(float value){
+        mixTextures += value;
+        if (mixTextures <= 0.0f)
+            mixTextures = 0.0f;
+        else if (mixTextures >= 1.0f)
+            mixTextures = 1.0f;
+    }  
     
     //https://stackoverflow.com/questions/21948804/how-would-i-get-a-bufferedimage-from-an-opengl-window
     public BufferedImage createImage() {

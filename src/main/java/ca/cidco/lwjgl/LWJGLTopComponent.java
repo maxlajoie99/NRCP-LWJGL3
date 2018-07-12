@@ -11,6 +11,8 @@ import ca.cidco.lwjgl.camera.Zoom;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.logging.Logger;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
@@ -61,9 +63,27 @@ public final class LWJGLTopComponent extends TopComponent{
         this.setVisible(true);
         this.transferFocus();
         
-        this.addMouseWheelListener(new Zoom());
-        this.addMouseMotionListener(new Rotate());
-        this.addMouseMotionListener(new Panning());
+        this.setFocusable(true);
+        this.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {}
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                
+                System.out.println(e.getKeyCode());
+                
+                if (e.getKeyCode() == KeyEvent.VK_UP)
+                    getPanel().getCanvas().mix(0.1f);
+                else if (e.getKeyCode() == KeyEvent.VK_DOWN)
+                    getPanel().getCanvas().mix(-0.1f);
+               
+                repaint();
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {}
+        });
         
         p.setVisible(false);
     }

@@ -39,7 +39,7 @@ public class Panning implements MouseMotionListener {
                 lastX = e.getX();
                 lastY = e.getY();
                 
-                tc.getPanel().getCanvas().panning(panX, panY);
+                //tc.getPanel().getCanvas().panning(panX, panY);
                 tc.repaint();
             }
         }

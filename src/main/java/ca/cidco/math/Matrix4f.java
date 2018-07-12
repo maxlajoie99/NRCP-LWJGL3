@@ -96,7 +96,7 @@ public class Matrix4f {
         m31 = 0f;
         m32 = 0f;
     }
-
+    
     /**
      * Adds this matrix to another matrix.
      *
@@ -279,12 +279,12 @@ public class Matrix4f {
      * Creates a orthographic projection matrix. Similar to
      * <code>glOrtho(left, right, bottom, top, near, far)</code>.
      *
-     * @param left   Coordinate for the left vertical clipping pane
-     * @param right  Coordinate for the right vertical clipping pane
+     * @param left Coordinate for the left vertical clipping pane
+     * @param right Coordinate for the right vertical clipping pane
      * @param bottom Coordinate for the bottom horizontal clipping pane
-     * @param top    Coordinate for the bottom horizontal clipping pane
-     * @param near   Coordinate for the near depth clipping pane
-     * @param far    Coordinate for the far depth clipping pane
+     * @param top Coordinate for the bottom horizontal clipping pane
+     * @param near Coordinate for the near depth clipping pane
+     * @param far Coordinate for the far depth clipping pane
      *
      * @return Orthographic matrix
      */
@@ -309,14 +309,12 @@ public class Matrix4f {
      * Creates a perspective projection matrix. Similar to
      * <code>glFrustum(left, right, bottom, top, near, far)</code>.
      *
-     * @param left   Coordinate for the left vertical clipping pane
-     * @param right  Coordinate for the right vertical clipping pane
+     * @param left Coordinate for the left vertical clipping pane
+     * @param right Coordinate for the right vertical clipping pane
      * @param bottom Coordinate for the bottom horizontal clipping pane
-     * @param top    Coordinate for the bottom horizontal clipping pane
-     * @param near   Coordinate for the near depth clipping pane, must be
-     *               positive
-     * @param far    Coordinate for the far depth clipping pane, must be
-     *               positive
+     * @param top Coordinate for the bottom horizontal clipping pane
+     * @param near Coordinate for the near depth clipping pane, must be positive
+     * @param far Coordinate for the far depth clipping pane, must be positive
      *
      * @return Perspective matrix
      */
@@ -344,12 +342,12 @@ public class Matrix4f {
      * Creates a perspective projection matrix. Similar to
      * <code>gluPerspective(fovy, aspec, zNear, zFar)</code>.
      *
-     * @param fovy   Field of view angle in degrees
+     * @param fovy Field of view angle in degrees
      * @param aspect The aspect ratio is the ratio of width to height
-     * @param near   Distance from the viewer to the near clipping plane, must
-     *               be positive
-     * @param far    Distance from the viewer to the far clipping plane, must be
-     *               positive
+     * @param near Distance from the viewer to the near clipping plane, must be
+     * positive
+     * @param far Distance from the viewer to the far clipping plane, must be
+     * positive
      *
      * @return Perspective matrix
      */
@@ -393,9 +391,9 @@ public class Matrix4f {
      * <code>glRotate(angle, x, y, z)</code>.
      *
      * @param angle Angle of rotation in degrees
-     * @param x     x coordinate of the rotation vector
-     * @param y     y coordinate of the rotation vector
-     * @param z     z coordinate of the rotation vector
+     * @param x x coordinate of the rotation vector
+     * @param y y coordinate of the rotation vector
+     * @param z z coordinate of the rotation vector
      *
      * @return Rotation matrix
      */
@@ -442,6 +440,26 @@ public class Matrix4f {
         scaling.m22 = z;
 
         return scaling;
+    }
+    
+    public static Matrix4f lookAt(Vector3f position, Vector3f target, Vector3f up){
+        Vector3f f = target.subtract(position).normalize();
+        Vector3f u = up.normalize();
+        Vector3f s = f.cross(u).normalize();
+        u = s.cross(f);
+        
+        Matrix4f result = new Matrix4f();
+        result.m00 = s.x;
+        result.m01 = s.y;
+        result.m02 = s.z;
+        result.m10 = u.x;
+        result.m11 = u.y;
+        result.m12 = u.z;
+        result.m20 = -f.x;
+        result.m21 = -f.y;
+        result.m22 = -f.z;
+        
+        return result.multiply(Matrix4f.translate(-position.x, -position.y, -position.z));
     }
 
 }

@@ -32,6 +32,7 @@ public class LWJGLCanvas extends AWTGLCanvas {
     BufferedImage image;
 
     int FLOAT_SIZE = Float.SIZE/Byte.SIZE;
+    float time = 0.0f;
 
     public LWJGLCanvas() {
         super();
@@ -182,10 +183,14 @@ public class LWJGLCanvas extends AWTGLCanvas {
         //Camera/View Space
         Vector3f camPos = new Vector3f(0.0f, 0.0f, 3.0f);
         Vector3f camTarget = new Vector3f(0.0f, 0.0f, 0.0f);
-        Vector3f camDir = camPos.subtract(camTarget).normalize();
-        Vector3f camRight = (new Vector3f(0.0f, 0.0f, 0.0f)).cross(camDir).normalize();
-        Vector3f camUp = camDir.cross(camRight);
+        Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f);
         
+        //Look At
+        time += 0.1f;
+        float radius = 10.0f;
+        float camX = (float)Math.sin(time) * radius;
+        float camZ = (float)Math.cos(time) * radius;
+        view = Matrix4f.lookAt(new Vector3f(camX, 0.0f, camZ), camTarget, up);
         
         shader.use();
         shader.setInt("texture1", 0);

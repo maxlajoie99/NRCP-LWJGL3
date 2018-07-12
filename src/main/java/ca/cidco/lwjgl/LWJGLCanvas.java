@@ -136,16 +136,17 @@ public class LWJGLCanvas extends AWTGLCanvas {
         else{
             System.out.println("Failed to load texture");
         }
-        
-        //Transformations
-        Matrix4f trans = Matrix4f.translate(0.5f, -0.5f, 0.0f);
-        trans = trans.multiply(Matrix4f.rotate(90.0f, 0.0f, 0.0f, 1.0f));
-        trans = trans.multiply(Matrix4f.scale(0.5f, 0.5f, 0.5f));
+
+        Matrix4f model = Matrix4f.rotate(-55.0f, 1.0f, 0.0f, 0.0f);
+        Matrix4f view = Matrix4f.translate(0.0f, 0.0f, -3.0f);
+        Matrix4f projection = Matrix4f.perspective(45.0f, aspect, 0.1f, 100f);
         
         shader.use();
         shader.setInt("texture1", 0);
         shader.setInt("texture2", 1);
-        shader.setMatrix4f("transform", trans);
+        shader.setMatrix4f("model", model);
+        shader.setMatrix4f("view", view);
+        shader.setMatrix4f("projection", projection);
         
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);

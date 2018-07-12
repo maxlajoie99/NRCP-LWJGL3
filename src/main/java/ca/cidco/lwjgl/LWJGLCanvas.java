@@ -179,6 +179,14 @@ public class LWJGLCanvas extends AWTGLCanvas {
         Matrix4f view = Matrix4f.translate(0.0f, 0.0f, -3.0f);
         Matrix4f projection = Matrix4f.perspective(45.0f, aspect, 0.1f, 100f);
         
+        //Camera/View Space
+        Vector3f camPos = new Vector3f(0.0f, 0.0f, 3.0f);
+        Vector3f camTarget = new Vector3f(0.0f, 0.0f, 0.0f);
+        Vector3f camDir = camPos.subtract(camTarget).normalize();
+        Vector3f camRight = (new Vector3f(0.0f, 0.0f, 0.0f)).cross(camDir).normalize();
+        Vector3f camUp = camDir.cross(camRight);
+        
+        
         shader.use();
         shader.setInt("texture1", 0);
         shader.setInt("texture2", 1);

@@ -105,6 +105,19 @@ public class LWJGLCanvas extends AWTGLCanvas {
             -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
         };
         
+        Vector3f[] cubePositions = {
+            new Vector3f(0.0f, 0.0f, 0.0f), 
+            new Vector3f(2.0f, 5.0f, -15.0f), 
+            new Vector3f(-1.5f, -2.2f, -2.5f),  
+            new Vector3f(-3.8f, -2.0f, -12.3f),  
+            new Vector3f(2.4f, -0.4f, -3.5f),  
+            new Vector3f(-1.7f, 3.0f, -7.5f),  
+            new Vector3f(1.3f, -2.0f, -2.5f),  
+            new Vector3f(1.5f, 2.0f, -2.5f), 
+            new Vector3f(1.5f, 0.2f, -1.5f), 
+            new Vector3f(-1.3f, 1.0f, -1.5f)  
+        };
+        
         int VAO = glGenVertexArrays();
         glBindVertexArray(VAO);
         
@@ -180,7 +193,15 @@ public class LWJGLCanvas extends AWTGLCanvas {
         
         shader.use();
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        for (int i = 0; i < cubePositions.length; i++) {
+            model = Matrix4f.translate(cubePositions[i].x, cubePositions[i].y, cubePositions[i].z);
+            model = model.multiply(Matrix4f.rotate(50.0f * i, 1.0f, 0.3f, 0.5f));
+            
+            shader.setMatrix4f("model", model);
+            
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+        
         
         swapBuffers();
         image = createImage();

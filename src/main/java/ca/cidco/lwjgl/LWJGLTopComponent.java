@@ -10,6 +10,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.util.logging.Logger;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
@@ -67,6 +69,32 @@ public final class LWJGLTopComponent extends TopComponent{
                 System.out.println(e.getKeyCode());
                 getPanel().getCanvas().moveCamera(e.getKeyCode());
                 repaint();
+            }
+        });
+        this.addMouseMotionListener(new MouseMotionListener() {
+            
+            private Integer lastX = null;
+            private Integer lastY = null;
+            
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (lastX != null && lastY != null){
+                    float sensitivity = 0.5f;
+                    
+                    float offsetX = (e.getX() - lastX) * sensitivity;
+                    float offsetY = (lastY - e.getY()) * sensitivity;
+                    
+                    getPanel().getCanvas().rotateCamera(offsetX, offsetY);
+                    lastX = e.getX();
+                    lastY = e.getY();
+                    repaint();
+                }
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                lastX = e.getX();
+                lastY = e.getY();
             }
         });
         

@@ -38,6 +38,9 @@ public class LWJGLCanvas extends AWTGLCanvas {
     Vector3f camPos = new Vector3f(0.0f, 0.0f, 3.0f);
     Vector3f camFront = new Vector3f(0.0f, 0.0f, -1.0f);
     Vector3f camUp = new Vector3f(0.0f, 1.0f, 0.0f);
+    
+    float pitch = 0.0f;
+    float yaw = 0.0f;
 
     public LWJGLCanvas() {
         super();
@@ -224,6 +227,17 @@ public class LWJGLCanvas extends AWTGLCanvas {
             camPos = camPos.subtract(camFront.cross(camUp).normalize().scale(camSpeed));
         if (keyCode == KeyEvent.VK_D)
             camPos = camPos.add(camFront.cross(camUp).normalize().scale(camSpeed));
+    }
+    
+    public void rotateCamera(float x, float y){
+        yaw += x;
+        pitch += y;
+        
+        Vector3f front = new Vector3f();
+        front.x = (float)Math.cos(Math.toRadians(pitch)) * (float)Math.cos(Math.toRadians(yaw));
+        front.y = (float)Math.sin(Math.toRadians(pitch));
+        front.z = (float)Math.cos(Math.toRadians(pitch)) * (float)Math.sin(Math.toRadians(yaw));
+        camFront = front.normalize();
     }
     
     //https://stackoverflow.com/questions/21948804/how-would-i-get-a-bufferedimage-from-an-opengl-window

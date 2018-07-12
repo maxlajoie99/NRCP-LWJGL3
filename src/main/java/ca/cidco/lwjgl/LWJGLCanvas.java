@@ -125,8 +125,8 @@ public class LWJGLCanvas extends AWTGLCanvas {
         //glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER, borderColor);
         
         //Texture filtering
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);      //Scaling down
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);       //Scaling up
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);      //Scaling down using Mipmapping
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);       //Scaling up (Don't use mipmap, useless + error)
         
         
         

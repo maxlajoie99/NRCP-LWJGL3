@@ -43,6 +43,8 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
 
     private Integer lastX = null;
     private Integer lastY = null;
+    
+    float time = 0.0f;
 
     private Camera camera;
 
@@ -153,6 +155,9 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 6 * FLOAT_SIZE, 0);
         glEnableVertexAttribArray(0);
         Vector3f lightPos = new Vector3f(1.2f, 1.0f, 2.0f);
+        time += 0.1f;
+        lightPos.x += 1.0f + Math.sin(time) * 2.0f;
+        lightPos.y += Math.sin(time / 2.0f);
         model = Matrix4f.translate(lightPos);
         model = model.multiply(Matrix4f.scale(0.2f, 0.2f, 0.2f));
         lampShader.use();

@@ -8,7 +8,6 @@ package ca.cidco.lwjgl;
 import ca.cidco.math.*;
 import ca.cidco.opengl.CAMERA_MOVEMENT;
 import ca.cidco.opengl.Camera;
-import ca.cidco.opengl.ImageReader;
 import ca.cidco.opengl.Shader;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -17,14 +16,10 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-import java.util.Random;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL13.*;
-import static org.lwjgl.opengl.GL14.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
@@ -45,7 +40,6 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
     private Integer lastY = null;
 
     private Camera camera;
-    float time = 0.0f;
 
     public LWJGLCanvas() {
         super();
@@ -162,18 +156,14 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         //Lighting
         objectShader.use();
         //Material
-        objectShader.setVect3f("material.ambient", new Vector3f(1.0f, 0.5f, 0.31f));
-        objectShader.setVect3f("material.diffuse", new Vector3f(1.0f, 0.5f, 0.31f));
-        objectShader.setVect3f("material.specular", new Vector3f(0.5f, 0.5f, 0.5f));
-        objectShader.setFloat("material.shininess", 32.0f);
+        objectShader.setVect3f("material.ambient", new Vector3f(0.0f, 0.1f, 0.06f));
+        objectShader.setVect3f("material.diffuse", new Vector3f(0.0f, 0.50980392f, 0.50980392f));
+        objectShader.setVect3f("material.specular", new Vector3f(0.50196078f, 0.50196078f, 0.50196078f));
+        objectShader.setFloat("material.shininess", 0.25f * 128);
         //Light
-        time += 0.1f;
-        Vector3f lightColor = new Vector3f((float)Math.sin(time * 2.0f), (float)Math.sin(time * 0.7f), (float)Math.sin(time * 1.3f));
-        Vector3f diffuse = lightColor.scale(0.5f);
-        Vector3f ambient = diffuse.scale(0.2f);
         objectShader.setVect3f("light.position", lightPos);
-        objectShader.setVect3f("light.ambient", ambient);
-        objectShader.setVect3f("light.diffuse", diffuse);
+        objectShader.setVect3f("light.ambient", new Vector3f(1.0f, 1.0f, 1.0f));
+        objectShader.setVect3f("light.diffuse", new Vector3f(1.0f, 1.0f, 1.0f));
         objectShader.setVect3f("light.specular", new Vector3f(1.0f, 1.0f, 1.0f));
         
         objectShader.setVect3f("viewPos", camera.getPosition());

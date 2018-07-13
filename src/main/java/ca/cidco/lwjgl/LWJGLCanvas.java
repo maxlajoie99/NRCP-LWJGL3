@@ -39,11 +39,11 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
 
     BufferedImage image;
 
-    private final int FLOAT_SIZE = Float.SIZE/Byte.SIZE;
-  
+    private final int FLOAT_SIZE = Float.SIZE / Byte.SIZE;
+
     private Integer lastX = null;
     private Integer lastY = null;
-    
+
     private Camera camera;
 
     public LWJGLCanvas() {
@@ -75,106 +75,110 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         float aspect = (float) w / h;
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
+
         glViewport(0, 0, w, h);
-        
+
         //Following the LeanOpenGL tutorial from https://learnopengl.com
         Shader objectShader = new Shader("simpleshader.vs", "simpleshader.fs");
         Shader lampShader = new Shader("simpleshader.vs", "lampshader.fs");
-          
+
         float vertices[] = {
-            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-             0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-             0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-             0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-             0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-             0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-             0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+            0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+            0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+            0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+            -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+            0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+            0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+            0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+            -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+            -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
+            -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
+            -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
+            -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
+            0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+            0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+            0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+            0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+            0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+            0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+            0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+            0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
+            0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
+            -0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+            -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+            0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+            0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+            0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+            -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+            -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f
         };
-        
+
         //Draw the cube
         int objectVAO = glGenVertexArrays();
         glBindVertexArray(objectVAO);
-        
+
         int objectVBO = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, objectVBO);
         glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
-        
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 5 * FLOAT_SIZE, 0);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 6 * FLOAT_SIZE, 0);
         glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 3, GL_FLOAT, false, 6 * FLOAT_SIZE, 3 * FLOAT_SIZE);
+        glEnableVertexAttribArray(1);
 
         Matrix4f model = new Matrix4f();
-        Matrix4f projection = Matrix4f.perspective(camera.getFov(), aspect, 0.1f, 100f);  
+        Matrix4f projection = Matrix4f.perspective(camera.getFov(), aspect, 0.1f, 100f);
         Matrix4f view = camera.getViewMatrix();
-        
+
         objectShader.use();
         objectShader.setMatrix4f("model", model);
         objectShader.setMatrix4f("view", view);
         objectShader.setMatrix4f("projection", projection);
         objectShader.setVect3f("objectColor", new Vector3f(1.0f, 0.5f, 0.31f));
         objectShader.setVect3f("lightColor", new Vector3f(1.0f, 1.0f, 1.0f));
-        
-        glBindVertexArray(objectVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        
-        //Draw lamp
+        //Create lamp
         int lampVAO = glGenVertexArrays();
         glBindVertexArray(lampVAO);
         int lampVBO = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, lampVBO);
         glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 5 * FLOAT_SIZE, 0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 6 * FLOAT_SIZE, 0);
         glEnableVertexAttribArray(0);
-        
-        model = Matrix4f.translate(1.2f, 1.0f, 2.0f);
+        Vector3f lightPos = new Vector3f(1.2f, 1.0f, 2.0f);
+        model = Matrix4f.translate(lightPos);
         model = model.multiply(Matrix4f.scale(0.2f, 0.2f, 0.2f));
-
         lampShader.use();
         lampShader.setMatrix4f("model", model);
         lampShader.setMatrix4f("view", view);
         lampShader.setMatrix4f("projection", projection);
         
+        //Lighting
+        objectShader.use();
+        objectShader.setVect3f("lightPos", lightPos);
+        
+        //Drawing
+        objectShader.use();
+        glBindVertexArray(objectVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        lampShader.use();
         glBindVertexArray(lampVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         
+
+        
+
         swapBuffers();
         //image = createImage();
     }
-    
+
     //https://stackoverflow.com/questions/21948804/how-would-i-get-a-bufferedimage-from-an-opengl-window
     public BufferedImage createImage() {
         int width = getWidth();
@@ -213,33 +217,37 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
 
     @Override
     public void keyTyped(KeyEvent e) {
-        
+
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
-        
-        if (keyCode == KeyEvent.VK_W)
+
+        if (keyCode == KeyEvent.VK_W) {
             camera.moveCamera(CAMERA_MOVEMENT.FORWARD);
-        if (keyCode == KeyEvent.VK_S)
+        }
+        if (keyCode == KeyEvent.VK_S) {
             camera.moveCamera(CAMERA_MOVEMENT.BACKWARD);
-        if (keyCode == KeyEvent.VK_A)
+        }
+        if (keyCode == KeyEvent.VK_A) {
             camera.moveCamera(CAMERA_MOVEMENT.LEFT);
-        if (keyCode == KeyEvent.VK_D)
+        }
+        if (keyCode == KeyEvent.VK_D) {
             camera.moveCamera(CAMERA_MOVEMENT.RIGHT);
-        
+        }
+
         render();
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        
+
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        if (lastX != null && lastY != null){
+        if (lastX != null && lastY != null) {
             float sensitivity = 0.1f;
 
             float offsetX = (e.getX() - lastX) * sensitivity;
@@ -263,5 +271,5 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         camera.zoom(e.getWheelRotation() * 1.0f);
         render();
     }
-    
+
 }

@@ -101,8 +101,21 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
             System.out.println("Failed to load texture");
         }
         
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, diffuseMap);
+        int specularMap = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, specularMap);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);    
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);    
+        
+        data = ImageReader.loadImage("container2_specular.png",width, height);
+        if (data != null){
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width[0], height[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+        else{
+            System.out.println("Failed to load texture");
+        }
         
         float vertices[] = {
             // positions          // normals           // texture coords
@@ -187,8 +200,8 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         objectShader.use();
         //Material
         objectShader.setInt("material.diffuse", 0);
-        objectShader.setVect3f("material.specular", new Vector3f(0.5f, 0.5f, 0.5f));
-        objectShader.setFloat("material.shininess", 32.0f);
+        objectShader.setInt("material.specular", 1);
+        objectShader.setFloat("material.shininess", 64.0f);
         //Light
         objectShader.setVect3f("light.ambient", new Vector3f(0.2f, 0.2f, 0.2f));
         objectShader.setVect3f("light.diffuse", new Vector3f(0.5f, 0.5f, 0.5f));
@@ -199,6 +212,12 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
 
         //Drawing
         objectShader.use();
+        
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, diffuseMap);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, specularMap);
+        
         glBindVertexArray(objectVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         lampShader.use();

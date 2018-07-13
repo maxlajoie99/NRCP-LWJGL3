@@ -75,6 +75,10 @@ public class Camera {
         return fov;
     }
     
+    public Vector3f getPosition(){
+        return position;
+    }
+    
     private void UpdateVectors(){
         Vector3f newFront = new Vector3f();
         newFront.x = (float)Math.cos(Math.toRadians(pitch)) * (float)Math.cos(Math.toRadians(yaw));

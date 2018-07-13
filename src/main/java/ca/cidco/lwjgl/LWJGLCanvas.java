@@ -6,9 +6,16 @@
 package ca.cidco.lwjgl;
 
 import ca.cidco.math.*;
+import ca.cidco.opengl.CAMERA_MOVEMENT;
+import ca.cidco.opengl.Camera;
 import ca.cidco.opengl.ImageReader;
 import ca.cidco.opengl.Shader;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -28,28 +35,29 @@ import org.lwjgl.opengl.awt.GLData;
  *
  * @author mlajoie
  */
-public class LWJGLCanvas extends AWTGLCanvas {
+public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotionListener, MouseWheelListener {
 
     BufferedImage image;
 
-    int FLOAT_SIZE = Float.SIZE/Byte.SIZE;
-   
-    //Camera/View Space
-    Vector3f camPos = new Vector3f(0.0f, 0.0f, 3.0f);
-    Vector3f camFront = new Vector3f(0.0f, 0.0f, -1.0f);
-    Vector3f camUp = new Vector3f(0.0f, 1.0f, 0.0f);
+    private final int FLOAT_SIZE = Float.SIZE/Byte.SIZE;
+  
+    private Integer lastX = null;
+    private Integer lastY = null;
     
-    float pitch = 0.0f;
-    float yaw = 0.0f;
-    
-    float fov = 45.0f;
+    private Camera camera;
 
     public LWJGLCanvas() {
         super();
+        this.addKeyListener(this);
+        this.addMouseMotionListener(this);
+        this.addMouseWheelListener(this);
     }
 
     public LWJGLCanvas(GLData data) {
         super(data);
+        this.addKeyListener(this);
+        this.addMouseMotionListener(this);
+        this.addMouseWheelListener(this);
     }
 
     @Override
@@ -57,6 +65,7 @@ public class LWJGLCanvas extends AWTGLCanvas {
         GL.createCapabilities();
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glEnable(GL_DEPTH_TEST);
+        camera = new Camera(new Vector3f(0.0f, 0.0f, 3.0f), new Vector3f(0.0f, 0.0f, -1.0f), new Vector3f(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 45.0f);
     }
 
     @Override
@@ -187,9 +196,9 @@ public class LWJGLCanvas extends AWTGLCanvas {
         }
 
         Matrix4f model = Matrix4f.rotate(50.0f * (new Random()).nextInt(360), 0.5f, 1.0f, 0.0f);
-        Matrix4f projection = Matrix4f.perspective(fov, aspect, 0.1f, 100f);
+        Matrix4f projection = Matrix4f.perspective(camera.getFov(), aspect, 0.1f, 100f);
            
-        Matrix4f view = Matrix4f.lookAt(camPos, camPos.add(camFront), camUp);
+        Matrix4f view = camera.getViewMatrix();
         
         shader.use();
         shader.setInt("texture1", 0);
@@ -216,39 +225,7 @@ public class LWJGLCanvas extends AWTGLCanvas {
         
         
         swapBuffers();
-        image = createImage();
-    }
-    
-    public void moveCamera(int keyCode){
-        float camSpeed = 0.05f;
-        if (keyCode == KeyEvent.VK_W)
-            camPos = camPos.add(camFront.scale(camSpeed));
-        if (keyCode == KeyEvent.VK_S)
-            camPos = camPos.subtract(camFront.scale(camSpeed));
-        if (keyCode == KeyEvent.VK_A)
-            camPos = camPos.subtract(camFront.cross(camUp).normalize().scale(camSpeed));
-        if (keyCode == KeyEvent.VK_D)
-            camPos = camPos.add(camFront.cross(camUp).normalize().scale(camSpeed));
-    }
-    
-    public void rotateCamera(float x, float y){
-        yaw += x;
-        pitch += y;
-        
-        Vector3f front = new Vector3f();
-        front.x = (float)Math.cos(Math.toRadians(pitch)) * (float)Math.cos(Math.toRadians(yaw));
-        front.y = (float)Math.sin(Math.toRadians(pitch));
-        front.z = (float)Math.cos(Math.toRadians(pitch)) * (float)Math.sin(Math.toRadians(yaw));
-        camFront = front.normalize();
-    }
-    
-    public void zoom(float y){
-        if (fov >= 1.0f && fov <= 55.0f)
-            fov += y;
-        if (fov <= 1.0f)
-            fov = 1.0f;
-        if (fov >= 55.0f)
-            fov = 55.0f;
+        //image = createImage();
     }
     
     //https://stackoverflow.com/questions/21948804/how-would-i-get-a-bufferedimage-from-an-opengl-window
@@ -287,4 +264,57 @@ public class LWJGLCanvas extends AWTGLCanvas {
         return image;
     }
 
+    @Override
+    public void keyTyped(KeyEvent e) {
+        
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        int keyCode = e.getKeyCode();
+        
+        if (keyCode == KeyEvent.VK_W)
+            camera.moveCamera(CAMERA_MOVEMENT.FORWARD);
+        if (keyCode == KeyEvent.VK_S)
+            camera.moveCamera(CAMERA_MOVEMENT.BACKWARD);
+        if (keyCode == KeyEvent.VK_A)
+            camera.moveCamera(CAMERA_MOVEMENT.LEFT);
+        if (keyCode == KeyEvent.VK_D)
+            camera.moveCamera(CAMERA_MOVEMENT.RIGHT);
+        
+        render();
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        if (lastX != null && lastY != null){
+            float sensitivity = 0.1f;
+
+            float offsetX = (e.getX() - lastX) * sensitivity;
+            float offsetY = (lastY - e.getY()) * sensitivity;
+
+            camera.rotateCamera(offsetX, offsetY);
+            lastX = e.getX();
+            lastY = e.getY();
+            render();
+        }
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        lastX = e.getX();
+        lastY = e.getY();
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        camera.zoom(e.getWheelRotation() * 1.0f);
+        render();
+    }
+    
 }

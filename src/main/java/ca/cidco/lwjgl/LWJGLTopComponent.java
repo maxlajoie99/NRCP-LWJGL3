@@ -64,51 +64,9 @@ public final class LWJGLTopComponent extends TopComponent{
         this.setVisible(true);
         this.transferFocus();
         
-        this.setFocusable(true);
-        this.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e){
-                System.out.println(e.getKeyCode());
-                getPanel().getCanvas().moveCamera(e.getKeyCode());
-                repaint();
-            }
-        });
-        this.addMouseMotionListener(new MouseMotionListener() {
-            
-            private Integer lastX = null;
-            private Integer lastY = null;
-            
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                if (lastX != null && lastY != null){
-                    float sensitivity = 0.5f;
-                    
-                    float offsetX = (e.getX() - lastX) * sensitivity;
-                    float offsetY = (lastY - e.getY()) * sensitivity;
-                    
-                    getPanel().getCanvas().rotateCamera(offsetX, offsetY);
-                    lastX = e.getX();
-                    lastY = e.getY();
-                    repaint();
-                }
-            }
-
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                lastX = e.getX();
-                lastY = e.getY();
-            }
-        });
         
-        this.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseWheelMoved(MouseWheelEvent e) {
-                getPanel().getCanvas().zoom(e.getWheelRotation() * 1.0f);
-                repaint();
-            }
-        });
         
-        p.setVisible(false);
+        //p.setVisible(false);
     }
 
     /**
@@ -140,8 +98,8 @@ public final class LWJGLTopComponent extends TopComponent{
                 
         p.setSize(this.getSize());
         p.render();
-        if (p.getImage() != null)
-            g.drawImage(p.getImage(), 0, 0, null);
+        /*if (p.getImage() != null)
+            g.drawImage(p.getImage(), 0, 0, null);*/
     }
     
     public LWJGLPanel getPanel(){

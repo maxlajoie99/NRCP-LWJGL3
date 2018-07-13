@@ -53,7 +53,7 @@ public class LWJGLPanel extends JPanel {
     public void setSize(Dimension dm){
         canvas.setSize(dm);
     }
-    
+     
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -78,7 +78,7 @@ public class LWJGLPanel extends JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
 }

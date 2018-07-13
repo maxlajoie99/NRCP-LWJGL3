@@ -6,6 +6,9 @@
 package ca.cidco.opengl;
 
 import ca.cidco.math.Matrix4f;
+import ca.cidco.math.Vector2f;
+import ca.cidco.math.Vector3f;
+import ca.cidco.math.Vector4f;
 import java.nio.FloatBuffer;
 import org.lwjgl.BufferUtils;
 import static org.lwjgl.opengl.GL11.*;
@@ -66,6 +69,18 @@ public class Shader {
     
     public void setFloat(String name, float value){
         glUniform1f(glGetUniformLocation(ID, name), value);
+    }
+    
+    public void setVect2f(String name, Vector2f values){
+        glUniform2f(glGetUniformLocation(ID, name), values.x, values.y);
+    }
+    
+    public void setVect3f(String name, Vector3f values){
+        glUniform3f(glGetUniformLocation(ID, name), values.x, values.y, values.z);
+    }
+    
+    public void setVect4f(String name, Vector4f values){
+        glUniform4f(glGetUniformLocation(ID, name), values.x, values.y, values.z, values.w);
     }
     
     public void setMatrix4f(String name, Matrix4f mat4){

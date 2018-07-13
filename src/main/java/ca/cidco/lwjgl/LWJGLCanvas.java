@@ -79,7 +79,8 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         glViewport(0, 0, w, h);
         
         //Following the LeanOpenGL tutorial from https://learnopengl.com
-        Shader shader = new Shader("simpleshader.vs", "simpleshader.fs");
+        Shader objectShader = new Shader("simpleshader.vs", "simpleshader.fs");
+        Shader lampShader = new Shader("simpleshader.vs", "lampshader.fs");
           
         float vertices[] = {
             -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -125,104 +126,50 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
             -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
         };
         
-        Vector3f[] cubePositions = {
-            new Vector3f(0.0f, 0.0f, 0.0f), 
-            new Vector3f(2.0f, 5.0f, -15.0f), 
-            new Vector3f(-1.5f, -2.2f, -2.5f),  
-            new Vector3f(-3.8f, -2.0f, -12.3f),  
-            new Vector3f(2.4f, -0.4f, -3.5f),  
-            new Vector3f(-1.7f, 3.0f, -7.5f),  
-            new Vector3f(1.3f, -2.0f, -2.5f),  
-            new Vector3f(1.5f, 2.0f, -2.5f), 
-            new Vector3f(1.5f, 0.2f, -1.5f), 
-            new Vector3f(-1.3f, 1.0f, -1.5f)  
-        };
+        //Draw the cube
+        int objectVAO = glGenVertexArrays();
+        glBindVertexArray(objectVAO);
         
-        int VAO = glGenVertexArrays();
-        glBindVertexArray(VAO);
-        
-        int VBO = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        int objectVBO = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, objectVBO);
         glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
         
-        //position
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 5 * FLOAT_SIZE, 0);
         glEnableVertexAttribArray(0);
-        //texture
-        glVertexAttribPointer(1, 2, GL_FLOAT, false, 5 * FLOAT_SIZE, 3 * FLOAT_SIZE);
-        glEnableVertexAttribArray(1);
 
-        //Generating texture
-        int texture1 = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, texture1);
-        
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-        //If using GL_CLAMP_TO_BORDER
-        //float borderColor[] = {1.0f, 1.0f, 0.0f, 1.0f};
-        //glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER, borderColor);
-        
-        //Texture filtering
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);      //Scaling down using Mipmapping
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);       //Scaling up (Don't use mipmap, useless + error)
-        
-        //Load image
-        int[] width = new int[1],
-            height = new int[1];
-
-        ByteBuffer data = ImageReader.loadImage("container.jpg",width, height);
-        if (data != null){
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width[0], height[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-            glGenerateMipmap(GL_TEXTURE_2D);
-        }
-        else{
-            System.out.println("Failed to load texture");
-        }
-        
-        int texture2 = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, texture2);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);    
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);    
-        
-        data = ImageReader.loadImage("awesomeface.png",width, height);
-        if (data != null){
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width[0], height[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-            glGenerateMipmap(GL_TEXTURE_2D);
-        }
-        else{
-            System.out.println("Failed to load texture");
-        }
-
-        Matrix4f model = Matrix4f.rotate(50.0f * (new Random()).nextInt(360), 0.5f, 1.0f, 0.0f);
-        Matrix4f projection = Matrix4f.perspective(camera.getFov(), aspect, 0.1f, 100f);
-           
+        Matrix4f model = new Matrix4f();
+        Matrix4f projection = Matrix4f.perspective(camera.getFov(), aspect, 0.1f, 100f);  
         Matrix4f view = camera.getViewMatrix();
         
-        shader.use();
-        shader.setInt("texture1", 0);
-        shader.setInt("texture2", 1);
-        shader.setMatrix4f("model", model);
-        shader.setMatrix4f("view", view);
-        shader.setMatrix4f("projection", projection);
+        objectShader.use();
+        objectShader.setMatrix4f("model", model);
+        objectShader.setMatrix4f("view", view);
+        objectShader.setMatrix4f("projection", projection);
+        objectShader.setVect3f("objectColor", new Vector3f(1.0f, 0.5f, 0.31f));
+        objectShader.setVect3f("lightColor", new Vector3f(1.0f, 1.0f, 1.0f));
         
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texture2);
+        glBindVertexArray(objectVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
         
-        shader.use();
-        glBindVertexArray(VAO);
-        for (int i = 0; i < cubePositions.length; i++) {
-            model = Matrix4f.translate(cubePositions[i].x, cubePositions[i].y, cubePositions[i].z);
-            model = model.multiply(Matrix4f.rotate(50.0f * i, 1.0f, 0.3f, 0.5f));
-            
-            shader.setMatrix4f("model", model);
-            
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
+        //Draw lamp
+        int lampVAO = glGenVertexArrays();
+        glBindVertexArray(lampVAO);
+        int lampVBO = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, lampVBO);
+        glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 5 * FLOAT_SIZE, 0);
+        glEnableVertexAttribArray(0);
         
+        model = Matrix4f.translate(1.2f, 1.0f, 2.0f);
+        model = model.multiply(Matrix4f.scale(0.2f, 0.2f, 0.2f));
+
+        lampShader.use();
+        lampShader.setMatrix4f("model", model);
+        lampShader.setMatrix4f("view", view);
+        lampShader.setMatrix4f("projection", projection);
+        
+        glBindVertexArray(lampVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
         
         swapBuffers();
         //image = createImage();

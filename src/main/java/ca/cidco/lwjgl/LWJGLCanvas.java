@@ -142,8 +142,6 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         objectShader.setMatrix4f("model", model);
         objectShader.setMatrix4f("view", view);
         objectShader.setMatrix4f("projection", projection);
-        objectShader.setVect3f("objectColor", new Vector3f(1.0f, 0.5f, 0.31f));
-        objectShader.setVect3f("lightColor", new Vector3f(1.0f, 1.0f, 1.0f));
         //Create lamp
         int lampVAO = glGenVertexArrays();
         glBindVertexArray(lampVAO);
@@ -162,6 +160,11 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         
         //Lighting
         objectShader.use();
+        objectShader.setVect3f("lightColor", new Vector3f(1.0f, 1.0f, 1.0f));
+        objectShader.setVect3f("material.ambient", new Vector3f(1.0f, 0.5f, 0.31f));
+        objectShader.setVect3f("material.diffuse", new Vector3f(1.0f, 0.5f, 0.31f));
+        objectShader.setVect3f("material.specular", new Vector3f(0.5f, 0.5f, 0.5f));
+        objectShader.setFloat("material.shininess", 32.0f);
         objectShader.setVect3f("lightPos", lightPos);
         objectShader.setVect3f("viewPos", camera.getPosition());
         

@@ -160,12 +160,17 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         
         //Lighting
         objectShader.use();
-        objectShader.setVect3f("lightColor", new Vector3f(1.0f, 1.0f, 1.0f));
+        //Material
         objectShader.setVect3f("material.ambient", new Vector3f(1.0f, 0.5f, 0.31f));
         objectShader.setVect3f("material.diffuse", new Vector3f(1.0f, 0.5f, 0.31f));
         objectShader.setVect3f("material.specular", new Vector3f(0.5f, 0.5f, 0.5f));
         objectShader.setFloat("material.shininess", 32.0f);
-        objectShader.setVect3f("lightPos", lightPos);
+        //Light
+        objectShader.setVect3f("light.position", lightPos);
+        objectShader.setVect3f("light.ambient", new Vector3f(0.2f, 0.2f, 0.2f));
+        objectShader.setVect3f("light.diffuse", new Vector3f(0.5f, 0.5f, 0.5f));
+        objectShader.setVect3f("light.specular", new Vector3f(1.0f, 1.0f, 1.0f));
+        
         objectShader.setVect3f("viewPos", camera.getPosition());
         
         //Drawing

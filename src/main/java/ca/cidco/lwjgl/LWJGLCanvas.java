@@ -79,7 +79,7 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         glViewport(0, 0, w, h);
 
         //Following the LeanOpenGL tutorial from https://learnopengl.com
-        Shader objectShader = new Shader("simpleshader.vs", "simpleshader.fs");
+        Shader objectShader = new Shader("gouraudshader.vs", "simpleshader.fs");
         Shader lampShader = new Shader("simpleshader.vs", "lampshader.fs");
 
         float vertices[] = {

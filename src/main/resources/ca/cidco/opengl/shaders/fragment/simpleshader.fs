@@ -2,6 +2,7 @@
 struct Material{
 	sampler2D diffuse;
 	sampler2D specular;
+	sampler2D emission;
 	float shininess;
 };
 
@@ -37,6 +38,7 @@ void main()
 	vec3 reflectDir = reflect(-lightDir, norm);
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 	vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));
+	vec3 emission = vec3(texture(material.emission, TexCoords));
 
-	FragColor = vec4((ambient + diffuse + specular), 1.0);
+	FragColor = vec4((ambient + diffuse + specular + emission), 1.0);
 } 

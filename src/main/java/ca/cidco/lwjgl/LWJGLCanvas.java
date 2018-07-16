@@ -117,6 +117,22 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
             System.out.println("Failed to load texture");
         }
         
+        int emissionMap = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, emissionMap);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);    
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);    
+        
+        data = ImageReader.loadImage("matrix.jpg",width, height);
+        if (data != null){
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width[0], height[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+        else{
+            System.out.println("Failed to load texture");
+        }
+        
         float vertices[] = {
             // positions          // normals           // texture coords
             -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
@@ -201,6 +217,7 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         //Material
         objectShader.setInt("material.diffuse", 0);
         objectShader.setInt("material.specular", 1);
+        objectShader.setInt("material.emission", 2);
         objectShader.setFloat("material.shininess", 64.0f);
         //Light
         objectShader.setVect3f("light.ambient", new Vector3f(0.2f, 0.2f, 0.2f));
@@ -217,6 +234,8 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         glBindTexture(GL_TEXTURE_2D, diffuseMap);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, specularMap);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, emissionMap);
         
         glBindVertexArray(objectVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);

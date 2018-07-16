@@ -7,7 +7,9 @@ package ca.cidco.lwjgl;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.util.logging.Logger;
+import org.lwjgl.opengl.awt.GLData;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -41,7 +43,9 @@ import org.openide.util.NbBundle.Messages;
 public final class LWJGLTopComponent extends TopComponent{
 
     static final Logger LOG = Logger.getLogger(LWJGLTopComponent.class.getName());
-    private LWJGLPanel p;
+    
+    private LWJGLCanvas canvas;
+    private GLData data;
     
     public LWJGLTopComponent() {
         initComponents();
@@ -51,13 +55,19 @@ public final class LWJGLTopComponent extends TopComponent{
         setMinimumSize(new Dimension(0,0));
         setLayout(new BorderLayout());
         
-        p = new LWJGLPanel();
-        add(p, BorderLayout.CENTER);
-        
-        this.setVisible(true);
-        this.transferFocus();
+        data = new GLData();
+        data.samples = 4;
+        canvas = new LWJGLCanvas(data);
+        canvas.setMinimumSize(new Dimension(0, 0));
+        add(canvas, BorderLayout.CENTER);
     }
 
+    @Override
+    public void paint(Graphics g){
+        canvas.render();
+    }
+     
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

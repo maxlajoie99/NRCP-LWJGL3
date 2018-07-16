@@ -8,21 +8,66 @@ package ca.cidco.opengl;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
 import java.nio.ByteBuffer;
 import javax.imageio.ImageIO;
 import org.lwjgl.BufferUtils;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.*;
+import static org.lwjgl.opengl.GL14.*;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL30.*;
 
 /**
  *
  * @author mlajoie
  */
-public class ImageReader {
-
+public class Image2D {
+    
+    int ID;
+    int Unit;
+    
+    int[] width = new int[1];
+    int[] height = new int[1];
+    
+    public Image2D(String fileName, int wrapS, int wrapT, int minFilter, int magFilter, int textureUnit){
+        Unit = textureUnit;
+        ID = glGenTextures();
+        
+        glActiveTexture(Unit);
+        glBindTexture(GL_TEXTURE_2D, ID);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapS);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);    
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+        
+        ByteBuffer data = loadImage(fileName, width, height);
+        if (data != null){
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width[0], height[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+        else{
+            System.out.println("Failed to load texture");
+        }
+    }
+    
+    public void bind(){
+        glActiveTexture(Unit);
+        glBindTexture(GL_TEXTURE_2D, ID);
+    }
+    
+    public int getWidth(){
+        return width[0];
+    }
+    
+    public int getHeight(){
+        return height[0];
+    }
+    
     public static ByteBuffer loadImage(String filename, int[] width, int[] height) {
         //https://github.com/SilverTiger/lwjgl3-tutorial/wiki/Textures
         try {
-            BufferedImage image = ImageIO.read(ImageReader.class.getResourceAsStream("images/" + filename));
+            BufferedImage image = ImageIO.read(Image2D.class.getResourceAsStream("images/" + filename));
 
             //Flip
             AffineTransform transform = AffineTransform.getScaleInstance(1f, -1f);
@@ -68,5 +113,5 @@ public class ImageReader {
         
         return null;
     }
-
+    
 }

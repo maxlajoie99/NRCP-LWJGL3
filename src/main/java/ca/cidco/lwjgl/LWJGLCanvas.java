@@ -8,7 +8,7 @@ package ca.cidco.lwjgl;
 import ca.cidco.math.*;
 import ca.cidco.opengl.CAMERA_MOVEMENT;
 import ca.cidco.opengl.Camera;
-import ca.cidco.opengl.ImageReader;
+import ca.cidco.opengl.Image2D;
 import ca.cidco.opengl.Shader;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -17,14 +17,11 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-import java.util.Random;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
-import static org.lwjgl.opengl.GL14.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
@@ -45,14 +42,17 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
     private Integer lastY = null;
 
     private Camera camera;
-
-    public LWJGLCanvas() {
-        super();
-        this.addKeyListener(this);
-        this.addMouseMotionListener(this);
-        this.addMouseWheelListener(this);
-    }
-
+    
+    int objectVAO;
+    int objectVBO;
+    int lampVAO;
+    int lampVBO;
+    
+    Shader objectShader;
+    Shader lampShader;
+    Image2D diffuseMap;
+    Image2D specularMap;
+    
     public LWJGLCanvas(GLData data) {
         super(data);
         this.addKeyListener(this);
@@ -65,105 +65,22 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         GL.createCapabilities();
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glEnable(GL_DEPTH_TEST);
+        
         camera = new Camera(new Vector3f(0.0f, 0.0f, 3.0f), new Vector3f(0.0f, 0.0f, -1.0f), new Vector3f(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 45.0f);
-    }
-
-    @Override
-    public void paintGL() {
-        int w = getWidth();
-        int h = getHeight();
-        float aspect = (float) w / h;
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glViewport(0, 0, w, h);
 
         //Following the LeanOpenGL tutorial from https://learnopengl.com
-        Shader objectShader = new Shader("simpleshader.vs", "simpleshader.fs");
-        Shader lampShader = new Shader("simpleshader.vs", "lampshader.fs");
+        objectShader = new Shader("simpleshader.vs", "simpleshader.fs");
+        lampShader = new Shader("simpleshader.vs", "lampshader.fs");
 
-        int diffuseMap = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, diffuseMap);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);    
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);    
+        diffuseMap = new Image2D("container2.png", GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR, GL_TEXTURE0);
+        specularMap = new Image2D("container2_specular.png", GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR, GL_TEXTURE1);
         
-        int[] width = new int[1];
-        int[] height = new int[1];
-        
-        ByteBuffer data = ImageReader.loadImage("container2.png",width, height);
-        if (data != null){
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width[0], height[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-            glGenerateMipmap(GL_TEXTURE_2D);
-        }
-        else{
-            System.out.println("Failed to load texture");
-        }
-        
-        int specularMap = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, specularMap);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);    
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);    
-        
-        data = ImageReader.loadImage("container2_specular.png",width, height);
-        if (data != null){
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width[0], height[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-            glGenerateMipmap(GL_TEXTURE_2D);
-        }
-        else{
-            System.out.println("Failed to load texture");
-        }
-        
-        float vertices[] = {
-            // positions          // normals           // texture coords
-            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-            0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,
-            0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
-            0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
-            -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-            0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-            0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-            0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-            -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-            -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-            -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-            -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-            -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-            -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-            0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-            0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-            0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-            0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-            -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f,
-            0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f,
-            0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-            0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-            -0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-            -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f,
-            -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-            0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-            0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-            0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-            -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-            -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f
-        };
-
-        //Draw the cube
-        int objectVAO = glGenVertexArrays();
+        objectVAO = glGenVertexArrays();
         glBindVertexArray(objectVAO);
 
-        int objectVBO = glGenBuffers();
+        objectVBO = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, objectVBO);
-        glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, Cube.getCubeVertices(), GL_STATIC_DRAW);
 
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * FLOAT_SIZE, 0);
         glEnableVertexAttribArray(0);
@@ -171,31 +88,16 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * FLOAT_SIZE, 6 * FLOAT_SIZE);
         glEnableVertexAttribArray(2);
-
-        Matrix4f model = new Matrix4f();
-        Matrix4f projection = Matrix4f.perspective(camera.getFov(), aspect, 0.1f, 100f);
-        Matrix4f view = camera.getViewMatrix();
-
-        objectShader.use();
-        objectShader.setMatrix4f("model", model);
-        objectShader.setMatrix4f("view", view);
-        objectShader.setMatrix4f("projection", projection);
-        //Create lamp
-        int lampVAO = glGenVertexArrays();
+        
+        lampVAO = glGenVertexArrays();
         glBindVertexArray(lampVAO);
-        int lampVBO = glGenBuffers();
+        
+        lampVBO = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, lampVBO);
-        glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, Cube.getCubeVertices(), GL_STATIC_DRAW);
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * FLOAT_SIZE, 0);
         glEnableVertexAttribArray(0);
-        Vector3f lightPos = new Vector3f(1.2f, 1.0f, 2.0f);
-        model = Matrix4f.translate(lightPos);
-        model = model.multiply(Matrix4f.scale(0.2f, 0.2f, 0.2f));
-        lampShader.use();
-        lampShader.setMatrix4f("model", model);
-        lampShader.setMatrix4f("view", view);
-        lampShader.setMatrix4f("projection", projection);
-
+        
         //Lighting
         objectShader.use();
         //Material
@@ -206,20 +108,52 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         objectShader.setVect3f("light.ambient", new Vector3f(0.2f, 0.2f, 0.2f));
         objectShader.setVect3f("light.diffuse", new Vector3f(0.5f, 0.5f, 0.5f));
         objectShader.setVect3f("light.specular", new Vector3f(1.0f, 1.0f, 1.0f));
-        objectShader.setVect3f("light.position", lightPos);
+    }
+    
+    @Override
+    public void paintGL() {
+        int w = getWidth();
+        int h = getHeight();
+        float aspect = (float) w / h;
 
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glViewport(0, 0, w, h);
+
+        //Matrix
+        Matrix4f model = new Matrix4f();
+        Matrix4f projection = Matrix4f.perspective(camera.getFov(), aspect, 0.1f, 100f);
+        Matrix4f view = camera.getViewMatrix();
+
+        //object positioning
+        objectShader.use();
+        objectShader.setMatrix4f("model", model);
+        objectShader.setMatrix4f("view", view);
+        objectShader.setMatrix4f("projection", projection);
+
+        //lamp positioning
+        Vector3f lightPos = new Vector3f(1.2f, 1.0f, 2.0f);
+        model = Matrix4f.translate(lightPos);
+        model = model.multiply(Matrix4f.scale(0.2f, 0.2f, 0.2f));
+        lampShader.use();
+        lampShader.setMatrix4f("model", model);
+        lampShader.setMatrix4f("view", view);
+        lampShader.setMatrix4f("projection", projection);
+
+        //changing uniforms
+        objectShader.use();
+        objectShader.setVect3f("light.position", lightPos);
         objectShader.setVect3f("viewPos", camera.getPosition());
 
         //Drawing
         objectShader.use();
         
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, diffuseMap);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, specularMap);
-        
+        diffuseMap.bind();
+        specularMap.bind();
+
         glBindVertexArray(objectVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
+        
         lampShader.use();
         glBindVertexArray(lampVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);

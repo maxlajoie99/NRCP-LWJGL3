@@ -9,6 +9,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.util.logging.Logger;
+import javax.swing.JPopupMenu;
 import org.lwjgl.opengl.awt.GLData;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
@@ -44,6 +45,13 @@ public final class LWJGLTopComponent extends TopComponent{
 
     static final Logger LOG = Logger.getLogger(LWJGLTopComponent.class.getName());
     
+    static{
+        // When using a GLCanvas, we have to set the Popup-Menues to be HeavyWeight, 
+        // so they display properly on top of the GLCanvas 
+        // http://netbeans-org.1045718.n5.nabble.com/JOGL-TopComponent-How-To-td5509428.html
+        JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+    }
+    
     private LWJGLCanvas canvas;
     private GLData data;
     
@@ -60,6 +68,8 @@ public final class LWJGLTopComponent extends TopComponent{
         canvas = new LWJGLCanvas(data);
         canvas.setMinimumSize(new Dimension(0, 0));
         add(canvas, BorderLayout.CENTER);
+        
+        
     }
 
     @Override
@@ -93,7 +103,7 @@ public final class LWJGLTopComponent extends TopComponent{
     
     @Override
     public void componentOpened() {   
-        
+        canvas.render();
     }
 
     @Override

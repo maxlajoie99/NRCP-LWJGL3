@@ -107,7 +107,7 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         int w = getWidth();
         int h = getHeight();
         float aspect = (float) w / h;
-        
+
         glViewport(0, 0, w, h);
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

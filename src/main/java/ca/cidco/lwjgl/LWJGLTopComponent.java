@@ -7,9 +7,7 @@ package ca.cidco.lwjgl;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.util.logging.Logger;
-import org.lwjgl.opengl.GL;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -82,17 +80,6 @@ public final class LWJGLTopComponent extends TopComponent{
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
-    
-    @Override
-    public void paint(Graphics g){
-        super.paint(g);
-
-        p.render();
-    }
-    
-    public LWJGLPanel getPanel(){
-        return p;
-    }
     
     @Override
     public void componentOpened() {   

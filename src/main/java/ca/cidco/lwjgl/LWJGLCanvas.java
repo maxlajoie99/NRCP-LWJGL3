@@ -16,9 +16,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.image.BufferedImage;
-import java.nio.FloatBuffer;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
@@ -30,14 +27,11 @@ import org.lwjgl.opengl.awt.GLData;
 
 /**
  *
- * @author mlajoie
+ * @author Maxime Lajoie
  */
 public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotionListener, MouseWheelListener {
 
     private final int FLOAT_SIZE = Float.SIZE / Byte.SIZE;
-
-    private Integer lastX = null;
-    private Integer lastY = null;
 
     private Camera camera;
     
@@ -60,7 +54,7 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
 
     @Override
     public void initGL() {
-        GL.createCapabilities();
+        GL.createCapabilities();   
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glEnable(GL_DEPTH_TEST);
         
@@ -159,6 +153,10 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         swapBuffers();
     }
 
+    
+    /**
+     * Key Events
+     */
     @Override
     public void keyTyped(KeyEvent e) {
 
@@ -188,6 +186,12 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
     public void keyReleased(KeyEvent e) {
 
     }
+
+    /**
+     * Mouse events 
+     */
+    private Integer lastX = null;
+    private Integer lastY = null;
 
     @Override
     public void mouseDragged(MouseEvent e) {

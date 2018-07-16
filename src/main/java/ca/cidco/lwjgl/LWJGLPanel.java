@@ -7,7 +7,7 @@ package ca.cidco.lwjgl;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.image.BufferedImage;
+import java.awt.Graphics;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
 import org.lwjgl.opengl.awt.GLData;
@@ -20,7 +20,7 @@ public class LWJGLPanel extends JPanel {
 
     private LWJGLCanvas canvas;
     private GLData data;
-   
+    
     static final Logger LOG = Logger.getLogger(LWJGLPanel.class.getName());
     
     public LWJGLPanel() {
@@ -37,11 +37,8 @@ public class LWJGLPanel extends JPanel {
         add(canvas, BorderLayout.CENTER);
     }
     
-    public LWJGLCanvas getCanvas(){
-        return canvas;
-    }
-    
-    public void render(){
+    @Override
+    public void paint(Graphics g){
         canvas.render();
     }
      

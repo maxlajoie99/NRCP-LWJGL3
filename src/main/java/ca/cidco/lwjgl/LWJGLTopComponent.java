@@ -8,13 +8,8 @@ package ca.cidco.lwjgl;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.util.logging.Logger;
+import org.lwjgl.opengl.GL;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -63,10 +58,6 @@ public final class LWJGLTopComponent extends TopComponent{
         
         this.setVisible(true);
         this.transferFocus();
-        
-        
-        
-        //p.setVisible(false);
     }
 
     /**
@@ -95,11 +86,8 @@ public final class LWJGLTopComponent extends TopComponent{
     @Override
     public void paint(Graphics g){
         super.paint(g);
-                
-        p.setSize(this.getSize());
+
         p.render();
-        /*if (p.getImage() != null)
-            g.drawImage(p.getImage(), 0, 0, null);*/
     }
     
     public LWJGLPanel getPanel(){
@@ -113,7 +101,7 @@ public final class LWJGLTopComponent extends TopComponent{
 
     @Override
     public void componentClosed() {
-
+        
     }
 
     void writeProperties(java.util.Properties p) {

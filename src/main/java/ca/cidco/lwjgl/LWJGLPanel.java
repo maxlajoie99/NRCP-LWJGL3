@@ -44,15 +44,6 @@ public class LWJGLPanel extends JPanel {
     public void render(){
         canvas.render();
     }
-    
-    public BufferedImage getImage(){
-        return canvas.image;
-    }
-    
-    @Override
-    public void setSize(Dimension dm){
-        canvas.setSize(dm);
-    }
      
     /**
      * This method is called from within the constructor to initialize the form.

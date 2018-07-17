@@ -65,18 +65,20 @@ public final class LWJGLTopComponent extends TopComponent{
         
         data = new GLData();
         data.samples = 4;
+        data.majorVersion = 3;
+        data.minorVersion = 3;
+        data.api = GLData.API.GL;
+        data.profile = GLData.Profile.CORE;
+        data.shareContext = canvas;
+        
         canvas = new LWJGLCanvas(data);
-        canvas.setMinimumSize(new Dimension(0, 0));
         add(canvas, BorderLayout.CENTER);
-        
-        
     }
 
     @Override
     public void paint(Graphics g){
         canvas.render();
     }
-     
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -103,12 +105,12 @@ public final class LWJGLTopComponent extends TopComponent{
     
     @Override
     public void componentOpened() {   
-        canvas.render();
+        
     }
 
     @Override
     public void componentClosed() {
-        
+
     }
 
     void writeProperties(java.util.Properties p) {

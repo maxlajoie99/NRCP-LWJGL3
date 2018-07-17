@@ -134,7 +134,8 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         //Flashlight
         objectShader.setVect3f("light.position", camera.getPosition());
         objectShader.setVect3f("light.direction", camera.getFront());
-        objectShader.setFloat("light.cutOff", (float)Math.cos(Math.toRadians(12.5f)));
+        objectShader.setFloat("light.inCutOff", (float)Math.cos(Math.toRadians(12.5f)));
+        objectShader.setFloat("light.outCutOff", (float)Math.cos(Math.toRadians(17.5f)));
         
         diffuseMap.bind();
         specularMap.bind();

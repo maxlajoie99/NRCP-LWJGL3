@@ -7,6 +7,7 @@ package ca.cidco.opengl.mesh;
 
 import ca.cidco.math.Vector2f;
 import ca.cidco.math.Vector3f;
+import ca.cidco.opengl.Image2D;
 import ca.cidco.opengl.Shader;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -18,11 +19,8 @@ import org.lwjgl.assimp.AINode;
 import org.lwjgl.assimp.AIScene;
 import org.lwjgl.assimp.AIString;
 import org.lwjgl.assimp.Assimp;
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL13.*;
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL11.GL_LINEAR;
+import static org.lwjgl.opengl.GL11.GL_REPEAT;
 
 /**
  *
@@ -32,6 +30,7 @@ public class Model {
     
     private List<Mesh> meshes = new ArrayList<>();
     private String directory;
+    private String folder;
     
     public Model(String path){
         LoadModel(path);
@@ -53,6 +52,7 @@ public class Model {
         }
         
         directory = path.substring(0, path.lastIndexOf("/"));
+        folder = path.substring(path.lastIndexOf("/"), path.length() - 1);
         ProcessNode(scene.mRootNode(), scene);
         
     }
@@ -128,22 +128,12 @@ public class Model {
             AIString path = AIString.calloc();
             Assimp.aiGetMaterialTexture(mat, type, 0, path, (IntBuffer) null, null, null, null, null, null);
             Texture texture = new Texture();
-            texture.id = loadTexture(path.dataString());
+            texture.id = new Image2D(folder + "/" + path.dataString(), GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR).getID();
             texture.type = typeName;
             texture.path = path.dataString();
             textures.add(texture);
         }
         
         return textures;
-    }
-    
-    private int loadTexture(String path){
-        String filePath = directory + "/" + path;
-        
-        int id = glGenTextures();
-        
-        
-        return -1;
-    }
-    
+    } 
 }

@@ -13,9 +13,6 @@ import javax.imageio.ImageIO;
 import org.lwjgl.BufferUtils;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
-import static org.lwjgl.opengl.GL14.*;
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
 /**
@@ -51,6 +48,31 @@ public class Image2D {
         }
     }
     
+    public Image2D(String fileName, int wrapS, int wrapT, int minFilter, int magFilter){
+        ID = glGenTextures();
+        
+        glBindTexture(GL_TEXTURE_2D, ID);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapS);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);    
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+        
+        ByteBuffer data = loadImage(fileName, width, height);
+        if (data != null){
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width[0], height[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+        else{
+            System.out.println("Failed to load texture");
+        }
+    }
+    
+    public void bind(int unit){
+        Unit = unit;
+        glActiveTexture(Unit);
+        glBindTexture(GL_TEXTURE_2D, ID);
+    }
+    
     public void bind(){
         glActiveTexture(Unit);
         glBindTexture(GL_TEXTURE_2D, ID);
@@ -62,6 +84,10 @@ public class Image2D {
     
     public int getHeight(){
         return height[0];
+    }
+    
+    public int getID(){
+        return ID;
     }
     
     public static ByteBuffer loadImage(String filename, int[] width, int[] height) {

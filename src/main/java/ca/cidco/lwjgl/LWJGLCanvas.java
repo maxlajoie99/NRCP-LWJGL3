@@ -51,6 +51,13 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         this.addMouseMotionListener(this);
         this.addMouseWheelListener(this);
     }
+    
+    Vector3f[] pointLightPositions = {
+	new Vector3f( 0.7f,  0.2f,  2.0f),
+	new Vector3f( 2.3f, -3.3f, -4.0f),
+	new Vector3f(-4.0f,  2.0f, -12.0f),
+	new Vector3f( 0.0f,  0.0f, -3.0f)
+    };  
 
     @Override
     public void initGL() {
@@ -61,7 +68,7 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         camera = new Camera(new Vector3f(0.0f, 0.0f, 3.0f), new Vector3f(0.0f, 0.0f, -1.0f), new Vector3f(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 45.0f);
 
         //Following the LeanOpenGL tutorial from https://learnopengl.com
-        objectShader = new Shader("simpleshader.vs", "flashlight.fs");
+        objectShader = new Shader("simpleshader.vs", "combinedlight.fs");
         lampShader = new Shader("simpleshader.vs", "lampshader.fs");
 
         diffuseMap = new Image2D("container2.png", GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR, GL_TEXTURE0);
@@ -97,18 +104,34 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         objectShader.setInt("material.diffuse", 0);
         objectShader.setInt("material.specular", 1);
         objectShader.setFloat("material.shininess", 64.0f);
-        //Light
-        objectShader.setVect3f("light.ambient", new Vector3f(0.2f, 0.2f, 0.2f));
-        objectShader.setVect3f("light.diffuse", new Vector3f(0.5f, 0.5f, 0.5f));
-        objectShader.setVect3f("light.specular", new Vector3f(1.0f, 1.0f, 1.0f));
+        //Directional Light
+        objectShader.setVect3f("dLight.direction", new Vector3f(-0.2f, -1.0f, -0.3f));
+        objectShader.setVect3f("dLight.ambient", new Vector3f(0.05f, 0.05f, 0.05f));
+        objectShader.setVect3f("dLight.diffuse", new Vector3f(0.4f, 0.4f, 0.4f));
+        objectShader.setVect3f("dLight.specular", new Vector3f(0.5f, 0.5f, 0.5f));
         
-        objectShader.setVect3f("light.attenuation", new Vector3f(1.0f, 0.09f, 0.032f));
+        for (int i = 0; i < pointLightPositions.length; i++) {
+            objectShader.setVect3f("pLights[" + i + "].position", pointLightPositions[i]);
+            
+            objectShader.setFloat("pLights[" + i + "].constant", 1.0f);
+            objectShader.setFloat("pLights[" + i + "].linear", 0.09f);
+            objectShader.setFloat("pLights[" + i + "].quadratic", 0.032f);
+            
+            objectShader.setVect3f("pLights[" + i + "].ambient", new Vector3f(0.05f, 0.05f, 0.05f));
+            objectShader.setVect3f("pLights[" + i + "].diffuse", new Vector3f(0.8f, 0.8f, 0.8f));
+            objectShader.setVect3f("pLights[" + i + "].specular", new Vector3f(1.0f, 1.0f, 1.0f));
+        }
         
-        lampShader.use();
-        Matrix4f model = new Matrix4f();
-        model = model.multiply(Matrix4f.translate(lightPos));
-        model = model.multiply(Matrix4f.scale(0.2f, 0.2f, 0.2f));
-        lampShader.setMatrix4f("model", model);
+        objectShader.setFloat("spotLight.inCutOff", (float)Math.cos(Math.toRadians(12.5f)));
+        objectShader.setFloat("spotLight.outCutOff", (float)Math.cos(Math.toRadians(17.5f)));
+        
+        objectShader.setFloat("spotLight.constant", 1.0f);
+        objectShader.setFloat("spotLight.linear", 0.09f);
+        objectShader.setFloat("spotLight.quadratic", 0.032f);
+        
+        objectShader.setVect3f("spotLight.ambient", new Vector3f(0.0f, 0.0f, 0.0f));
+        objectShader.setVect3f("spotLight.diffuse", new Vector3f(1.0f, 1.0f, 1.0f));
+        objectShader.setVect3f("spotLight.specular", new Vector3f(1.0f, 1.0f, 1.0f));
     }
     
     @Override
@@ -132,11 +155,9 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         objectShader.setVect3f("viewPos", camera.getPosition());
         
         //Flashlight
-        objectShader.setVect3f("light.position", camera.getPosition());
-        objectShader.setVect3f("light.direction", camera.getFront());
-        objectShader.setFloat("light.inCutOff", (float)Math.cos(Math.toRadians(12.5f)));
-        objectShader.setFloat("light.outCutOff", (float)Math.cos(Math.toRadians(17.5f)));
-        
+        objectShader.setVect3f("spotLight.position", camera.getPosition());
+        objectShader.setVect3f("spotLight.direction", camera.getFront());
+ 
         diffuseMap.bind();
         specularMap.bind();
         glBindVertexArray(objectVAO);
@@ -151,12 +172,18 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
         
-        lampShader.use();
-        lampShader.setMatrix4f("projection", projection);
-        lampShader.setMatrix4f("view", view);
+        for (int i = 0; i < pointLightPositions.length; i++) {
+            lampShader.use();
+            lampShader.setMatrix4f("projection", projection);
+            lampShader.setMatrix4f("view", view);
+            Matrix4f model = new Matrix4f();
+            model = model.multiply(Matrix4f.translate(pointLightPositions[i]));
+            model = model.multiply(Matrix4f.scale(0.2f, 0.2f, 0.2f));
+            lampShader.setMatrix4f("model", model);
         
-        glBindVertexArray(lampVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+            glBindVertexArray(lampVAO);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
         
         swapBuffers();
     }

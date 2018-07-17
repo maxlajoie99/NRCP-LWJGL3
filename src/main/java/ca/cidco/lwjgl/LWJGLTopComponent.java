@@ -21,7 +21,7 @@ import org.openide.util.NbBundle.Messages;
  * Top component which displays something.
  */
 @ConvertAsProperties(
-        dtd = "-//ca.cidco.mavenlwjgl//LWJGL//EN",
+        dtd = "-//ca.cidco.lwjgl//LWJGL//EN",
         autostore = false
 )
 @TopComponent.Description(
@@ -30,7 +30,7 @@ import org.openide.util.NbBundle.Messages;
         persistenceType = TopComponent.PERSISTENCE_NEVER
 )
 @TopComponent.Registration(mode = "editor", openAtStartup = true)
-@ActionID(category = "Window", id = "ca.cidco.mavenlwjgl.LWJGLTopComponent")
+@ActionID(category = "Window", id = "ca.cidco.lwjgl.LWJGLTopComponent")
 @ActionReference(path = "Menu/Window" /*, position = 333 */)
 @TopComponent.OpenActionRegistration(
         displayName = "#CTL_LWJGLAction",

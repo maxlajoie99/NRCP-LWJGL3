@@ -10,6 +10,7 @@ import ca.cidco.opengl.CAMERA_MOVEMENT;
 import ca.cidco.opengl.Camera;
 import ca.cidco.opengl.Image2D;
 import ca.cidco.opengl.Shader;
+import ca.cidco.opengl.mesh.Model;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -40,11 +41,9 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
     int lampVAO;
     int lampVBO;
     
-    Shader objectShader;
-    Shader lampShader;
-    Image2D diffuseMap;
-    Image2D specularMap;
-    
+    Shader myShader;
+    Model myModel;
+            
     public LWJGLCanvas(GLData data) {
         super(data);
         this.addKeyListener(this);
@@ -67,71 +66,8 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         
         camera = new Camera(new Vector3f(0.0f, 0.0f, 3.0f), new Vector3f(0.0f, 0.0f, -1.0f), new Vector3f(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 45.0f);
 
-        //Following the LeanOpenGL tutorial from https://learnopengl.com
-        objectShader = new Shader("simpleshader.vs", "combinedlight.fs");
-        lampShader = new Shader("simpleshader.vs", "lampshader.fs");
-
-        diffuseMap = new Image2D("container2.png", GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR, GL_TEXTURE0);
-        specularMap = new Image2D("container2_specular.png", GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR, GL_TEXTURE1);
-        
-        objectVAO = glGenVertexArrays();
-        glBindVertexArray(objectVAO);
-
-        objectVBO = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, objectVBO);
-        glBufferData(GL_ARRAY_BUFFER, Cube.getCubeVertices(), GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * FLOAT_SIZE, 0);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 3, GL_FLOAT, false, 8 * FLOAT_SIZE, 3 * FLOAT_SIZE);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * FLOAT_SIZE, 6 * FLOAT_SIZE);
-        glEnableVertexAttribArray(2);
-        
-        Vector3f lightPos = new Vector3f(1.2f, 1.0f, 2.0f);
-        lampVAO = glGenVertexArrays();
-        glBindVertexArray(lampVAO);
-        
-        lampVBO = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, lampVBO);
-        glBufferData(GL_ARRAY_BUFFER, Cube.getCubeVertices(), GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * FLOAT_SIZE, 0);
-        glEnableVertexAttribArray(0);
-        
-        //Lighting
-        objectShader.use();
-        //Material
-        objectShader.setInt("material.diffuse", 0);
-        objectShader.setInt("material.specular", 1);
-        objectShader.setFloat("material.shininess", 64.0f);
-        //Directional Light
-        objectShader.setVect3f("dLight.direction", new Vector3f(-0.2f, -1.0f, -0.3f));
-        objectShader.setVect3f("dLight.ambient", new Vector3f(0.05f, 0.05f, 0.05f));
-        objectShader.setVect3f("dLight.diffuse", new Vector3f(0.4f, 0.4f, 0.4f));
-        objectShader.setVect3f("dLight.specular", new Vector3f(0.5f, 0.5f, 0.5f));
-        
-        for (int i = 0; i < pointLightPositions.length; i++) {
-            objectShader.setVect3f("pLights[" + i + "].position", pointLightPositions[i]);
-            
-            objectShader.setFloat("pLights[" + i + "].constant", 1.0f);
-            objectShader.setFloat("pLights[" + i + "].linear", 0.09f);
-            objectShader.setFloat("pLights[" + i + "].quadratic", 0.032f);
-            
-            objectShader.setVect3f("pLights[" + i + "].ambient", new Vector3f(0.05f, 0.05f, 0.05f));
-            objectShader.setVect3f("pLights[" + i + "].diffuse", new Vector3f(0.8f, 0.8f, 0.8f));
-            objectShader.setVect3f("pLights[" + i + "].specular", new Vector3f(1.0f, 1.0f, 1.0f));
-        }
-        
-        objectShader.setFloat("spotLight.inCutOff", (float)Math.cos(Math.toRadians(12.5f)));
-        objectShader.setFloat("spotLight.outCutOff", (float)Math.cos(Math.toRadians(17.5f)));
-        
-        objectShader.setFloat("spotLight.constant", 1.0f);
-        objectShader.setFloat("spotLight.linear", 0.09f);
-        objectShader.setFloat("spotLight.quadratic", 0.032f);
-        
-        objectShader.setVect3f("spotLight.ambient", new Vector3f(0.0f, 0.0f, 0.0f));
-        objectShader.setVect3f("spotLight.diffuse", new Vector3f(1.0f, 1.0f, 1.0f));
-        objectShader.setVect3f("spotLight.specular", new Vector3f(1.0f, 1.0f, 1.0f));
+        myShader = new Shader("modelshader.vs", "modelshader.fs");
+        myModel = new Model("/home/mlajoie/Workspace/MavenLWJGL/src/main/resources/ca/cidco/lwjgl/nanosuit.obj");
     }
     
     @Override
@@ -147,43 +83,17 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         //Matrix
         Matrix4f projection = Matrix4f.perspective(camera.getFov(), aspect, 0.1f, 100f);
         Matrix4f view = camera.getViewMatrix();
-
-        //object positioning
-        objectShader.use();
-        objectShader.setMatrix4f("view", view);
-        objectShader.setMatrix4f("projection", projection);
-        objectShader.setVect3f("viewPos", camera.getPosition());
+        Matrix4f model = new Matrix4f();
+        model = model.multiply(Matrix4f.translate(0.0f, -1.75f, 0.0f));
+        model = model.multiply(Matrix4f.scale(0.2f, 0.2f, 0.2f));
         
-        //Flashlight
-        objectShader.setVect3f("spotLight.position", camera.getPosition());
-        objectShader.setVect3f("spotLight.direction", camera.getFront());
- 
-        diffuseMap.bind();
-        specularMap.bind();
-        glBindVertexArray(objectVAO);
+        myShader.use();
+        myShader.setMatrix4f("model", model);
+        myShader.setMatrix4f("projection", projection);
+        myShader.setMatrix4f("view", view);
         
-        for (int i = 0; i < Cube.getCubePositions().length; i++) {
-            objectShader.use();
-            Matrix4f model = new Matrix4f();
-            model = model.multiply(Matrix4f.translate(Cube.getCubePositions()[i]));
-            model = model.multiply(Matrix4f.rotate(20f * i, 1.0f, 0.3f, 0.5f));
-            objectShader.setMatrix4f("model", model);
-            
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
+        myModel.draw(myShader);
         
-        for (int i = 0; i < pointLightPositions.length; i++) {
-            lampShader.use();
-            lampShader.setMatrix4f("projection", projection);
-            lampShader.setMatrix4f("view", view);
-            Matrix4f model = new Matrix4f();
-            model = model.multiply(Matrix4f.translate(pointLightPositions[i]));
-            model = model.multiply(Matrix4f.scale(0.2f, 0.2f, 0.2f));
-            lampShader.setMatrix4f("model", model);
-        
-            glBindVertexArray(lampVAO);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
         
         swapBuffers();
     }

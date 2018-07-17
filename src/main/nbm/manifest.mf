@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
-OpenIDE-Module-Localizing-Bundle: ca/cidco/mavenlwjgl/Bundle.properties
+OpenIDE-Module-Localizing-Bundle: ca/cidco/lwjgl/Bundle.properties
 OpenIDE-Module-Requires: org.openide.windows.WindowManager
 

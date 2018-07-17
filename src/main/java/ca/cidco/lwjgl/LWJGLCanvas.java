@@ -100,6 +100,7 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         objectShader.setVect3f("light.ambient", new Vector3f(0.2f, 0.2f, 0.2f));
         objectShader.setVect3f("light.diffuse", new Vector3f(0.5f, 0.5f, 0.5f));
         objectShader.setVect3f("light.specular", new Vector3f(1.0f, 1.0f, 1.0f));
+        objectShader.setVect3f("light.direction", new Vector3f(-0.2f, -1.0f, -0.3f));
     }
     
     @Override
@@ -113,43 +114,29 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //Matrix
-        Matrix4f model = new Matrix4f();
         Matrix4f projection = Matrix4f.perspective(camera.getFov(), aspect, 0.1f, 100f);
         Matrix4f view = camera.getViewMatrix();
 
         //object positioning
         objectShader.use();
-        objectShader.setMatrix4f("model", model);
         objectShader.setMatrix4f("view", view);
         objectShader.setMatrix4f("projection", projection);
-
-        //lamp positioning
-        Vector3f lightPos = new Vector3f(1.2f, 1.0f, 2.0f);
-        model = Matrix4f.translate(lightPos);
-        model = model.multiply(Matrix4f.scale(0.2f, 0.2f, 0.2f));
-        lampShader.use();
-        lampShader.setMatrix4f("model", model);
-        lampShader.setMatrix4f("view", view);
-        lampShader.setMatrix4f("projection", projection);
-
-        //changing uniforms
-        objectShader.use();
-        objectShader.setVect3f("light.position", lightPos);
         objectShader.setVect3f("viewPos", camera.getPosition());
-
-        //Drawing
-        objectShader.use();
         
         diffuseMap.bind();
         specularMap.bind();
-
         glBindVertexArray(objectVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
         
-        lampShader.use();
-        glBindVertexArray(lampVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-
+        for (int i = 0; i < Cube.getCubePositions().length; i++) {
+            objectShader.use();
+            Matrix4f model = new Matrix4f();
+            model = model.multiply(Matrix4f.translate(Cube.getCubePositions()[i]));
+            model = model.multiply(Matrix4f.rotate(20f * i, 1.0f, 0.3f, 0.5f));
+            objectShader.setMatrix4f("model", model);
+            
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+        
         swapBuffers();
     }
 

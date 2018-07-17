@@ -61,7 +61,7 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         camera = new Camera(new Vector3f(0.0f, 0.0f, 3.0f), new Vector3f(0.0f, 0.0f, -1.0f), new Vector3f(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 45.0f);
 
         //Following the LeanOpenGL tutorial from https://learnopengl.com
-        objectShader = new Shader("simpleshader.vs", "simpleshader.fs");
+        objectShader = new Shader("simpleshader.vs", "flashlight.fs");
         lampShader = new Shader("simpleshader.vs", "lampshader.fs");
 
         diffuseMap = new Image2D("container2.png", GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR, GL_TEXTURE0);
@@ -98,7 +98,6 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         objectShader.setInt("material.specular", 1);
         objectShader.setFloat("material.shininess", 64.0f);
         //Light
-        objectShader.setVect3f("light.position", lightPos);
         objectShader.setVect3f("light.ambient", new Vector3f(0.2f, 0.2f, 0.2f));
         objectShader.setVect3f("light.diffuse", new Vector3f(0.5f, 0.5f, 0.5f));
         objectShader.setVect3f("light.specular", new Vector3f(1.0f, 1.0f, 1.0f));
@@ -131,6 +130,11 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         objectShader.setMatrix4f("view", view);
         objectShader.setMatrix4f("projection", projection);
         objectShader.setVect3f("viewPos", camera.getPosition());
+        
+        //Flashlight
+        objectShader.setVect3f("light.position", camera.getPosition());
+        objectShader.setVect3f("light.direction", camera.getFront());
+        objectShader.setFloat("light.cutOff", (float)Math.cos(Math.toRadians(12.5f)));
         
         diffuseMap.bind();
         specularMap.bind();

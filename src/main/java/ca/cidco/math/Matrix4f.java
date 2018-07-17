@@ -387,13 +387,7 @@ public class Matrix4f {
     }
     
     public static Matrix4f translate(Vector3f v) {
-        Matrix4f translation = new Matrix4f();
-
-        translation.m03 = v.x;
-        translation.m13 = v.y;
-        translation.m23 = v.z;
-
-        return translation;
+        return translate(v.x, v.y, v.z);
     }
 
     /**

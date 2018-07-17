@@ -81,6 +81,7 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * FLOAT_SIZE, 6 * FLOAT_SIZE);
         glEnableVertexAttribArray(2);
         
+        Vector3f lightPos = new Vector3f(1.2f, 1.0f, 2.0f);
         lampVAO = glGenVertexArrays();
         glBindVertexArray(lampVAO);
         
@@ -97,10 +98,18 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         objectShader.setInt("material.specular", 1);
         objectShader.setFloat("material.shininess", 64.0f);
         //Light
+        objectShader.setVect3f("light.position", lightPos);
         objectShader.setVect3f("light.ambient", new Vector3f(0.2f, 0.2f, 0.2f));
         objectShader.setVect3f("light.diffuse", new Vector3f(0.5f, 0.5f, 0.5f));
         objectShader.setVect3f("light.specular", new Vector3f(1.0f, 1.0f, 1.0f));
-        objectShader.setVect3f("light.direction", new Vector3f(-0.2f, -1.0f, -0.3f));
+        
+        objectShader.setVect3f("light.attenuation", new Vector3f(1.0f, 0.09f, 0.032f));
+        
+        lampShader.use();
+        Matrix4f model = new Matrix4f();
+        model = model.multiply(Matrix4f.translate(lightPos));
+        model = model.multiply(Matrix4f.scale(0.2f, 0.2f, 0.2f));
+        lampShader.setMatrix4f("model", model);
     }
     
     @Override
@@ -136,6 +145,13 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
             
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
+        
+        lampShader.use();
+        lampShader.setMatrix4f("projection", projection);
+        lampShader.setMatrix4f("view", view);
+        
+        glBindVertexArray(lampVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
         
         swapBuffers();
     }

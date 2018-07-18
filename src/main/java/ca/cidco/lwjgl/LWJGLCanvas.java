@@ -68,6 +68,10 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         GL.createCapabilities();   
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_STENCIL_TEST);
+        
+        glStencilMask(0xFF);    //Enable writing (Everything stay the same)
+        //glStencilMask(0x00);    //Disable writing (Everything ends up as 0)
         
         camera = new Camera(new Vector3f(0.0f, 0.0f, 3.0f), new Vector3f(0.0f, 0.0f, -1.0f), new Vector3f(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 45.0f);
 
@@ -112,7 +116,7 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
 
         glViewport(0, 0, w, h);
         
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         //Matrix
         Matrix4f projection = Matrix4f.perspective(camera.getFov(), aspect, 0.1f, 100f);

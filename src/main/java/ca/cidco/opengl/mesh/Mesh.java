@@ -36,6 +36,8 @@ public class Mesh {
     public void draw(Shader shader){
         int diffuseNB = 1;
         int specularNB = 1;
+        int normalNB = 1;
+        int heightNB = 1;
         
         for (int i = 0; i < textures.length; i++) {
             glActiveTexture(GL_TEXTURE0 + i);
@@ -46,9 +48,13 @@ public class Mesh {
                 number = "" + diffuseNB++;
             } else if (name.equals("texture_specular")){
                 number = "" + specularNB++;
+            } else if (name.equals("texture_normal")){
+                number = "" + normalNB++;
+            } else if (name.equals("texture_height")){
+                number = "" + heightNB++;
             }
             
-            shader.setInt("material." + name + number, i);
+            shader.setInt(name + number, i);
             glBindTexture(GL_TEXTURE_2D, textures[i].id);
         }
         
@@ -72,14 +78,22 @@ public class Mesh {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
         
+        int size = vertices[0].sizeof();
+        
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * Float.SIZE/Byte.SIZE, 0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, size * Float.SIZE/Byte.SIZE, 0);
         
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, false, 8 * Float.SIZE/Byte.SIZE, 3 * Float.SIZE/Byte.SIZE);
+        glVertexAttribPointer(1, 3, GL_FLOAT, false, size * Float.SIZE/Byte.SIZE, 3 * Float.SIZE/Byte.SIZE);
         
         glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * Float.SIZE/Byte.SIZE, 6 * Float.SIZE/Byte.SIZE);
+        glVertexAttribPointer(2, 2, GL_FLOAT, false, size * Float.SIZE/Byte.SIZE, 6 * Float.SIZE/Byte.SIZE);
+        
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 3, GL_FLOAT, false, size * Float.SIZE/Byte.SIZE, 8 * Float.SIZE/Byte.SIZE);
+        
+        glEnableVertexAttribArray(4);
+        glVertexAttribPointer(4, 3, GL_FLOAT, false, size * Float.SIZE/Byte.SIZE, 11 * Float.SIZE/Byte.SIZE);
         
         glBindVertexArray(0);
     }

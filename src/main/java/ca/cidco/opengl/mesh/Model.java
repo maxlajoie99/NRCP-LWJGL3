@@ -29,12 +29,14 @@ import static org.lwjgl.opengl.GL11.GL_REPEAT;
 public class Model {
 
     private List<Mesh> meshes = new ArrayList<>();
-    private String directory;
     private String folder;
+    
+    private boolean gammaCorrection;
 
     private List<Texture> loadedTexture = new ArrayList<>();
 
-    public Model(String path) {
+    public Model(String path, boolean gamma) {
+        gammaCorrection = gamma;
         LoadModel(path);
     }
 
@@ -46,14 +48,13 @@ public class Model {
 
     //https://lwjglgamedev.gitbooks.io/3d-game-development-with-lwjgl/content/chapter27/chapter27.html
     private void LoadModel(String path) {
-        AIScene scene = Assimp.aiImportFile(path, Assimp.aiProcess_Triangulate | Assimp.aiProcess_FlipUVs);
+        AIScene scene = Assimp.aiImportFile(path, Assimp.aiProcess_Triangulate | Assimp.aiProcess_FlipUVs | Assimp.aiProcess_CalcTangentSpace);
 
         if (scene == null) {
             System.out.println("Error while loading the model\n" + Assimp.aiGetErrorString());
             return;
         }
 
-        directory = path.substring(0, path.lastIndexOf("/"));
         folder = path.substring(path.lastIndexOf("/") + 1, path.length());
         ProcessNode(scene.mRootNode(), scene);
 
@@ -90,13 +91,25 @@ public class Model {
             normal.z = mesh.mNormals().get(i).x();
             vertex.Normal = normal;
 
-            Vector2f texCoords = new Vector2f();
+            Vector2f texCoords = new Vector2f(0.0f, 0.0f);
             if (mesh.mTextureCoords() != null) {
-                texCoords.x = mesh.mTextureCoords(0).x();
-                texCoords.y = mesh.mTextureCoords(0).y();
+                texCoords.x = mesh.mTextureCoords(0).get(i).x();
+                texCoords.y = mesh.mTextureCoords(0).get(i).y();
             }
             vertex.TexCoords = texCoords;
-
+            
+            Vector3f tangent = new Vector3f();
+            tangent.x = mesh.mTangents().get(i).x();
+            tangent.y = mesh.mTangents().get(i).y();
+            tangent.z = mesh.mTangents().get(i).z();
+            vertex.Tangent = tangent;
+            
+            Vector3f bitangent = new Vector3f();
+            bitangent.x = mesh.mBitangents().get(i).x();
+            bitangent.y = mesh.mBitangents().get(i).y();
+            bitangent.z = mesh.mBitangents().get(i).z();
+            vertex.Bitangent = bitangent;
+            
             vertices.add(vertex);
         }
 
@@ -107,20 +120,33 @@ public class Model {
             }
         }
 
-        if (mesh.mMaterialIndex() >= 0) {
-            AIMaterial material = AIMaterial.create(scene.mMaterials().get(mesh.mMaterialIndex()));
-            List<Texture> diffuseMaps = LoadMaterialTextures(material, Assimp.aiTextureType_DIFFUSE, "texture_diffuse");
-            textures.addAll(diffuseMaps);
-            List<Texture> specularMaps = LoadMaterialTextures(material, Assimp.aiTextureType_SPECULAR, "texture_specular");
-            textures.addAll(specularMaps);
-        }
+        AIMaterial material = AIMaterial.create(scene.mMaterials().get(mesh.mMaterialIndex()));
+        
+        List<Texture> diffuseMaps = LoadMaterialTextures(material, Assimp.aiTextureType_DIFFUSE, "texture_diffuse");
+        textures.addAll(diffuseMaps);
+        List<Texture> specularMaps = LoadMaterialTextures(material, Assimp.aiTextureType_SPECULAR, "texture_specular");
+        textures.addAll(specularMaps);
+        List<Texture> normalMaps = LoadMaterialTextures(material, Assimp.aiTextureType_HEIGHT, "texture_normal");
+        textures.addAll(normalMaps);
+        List<Texture> heightMaps = LoadMaterialTextures(material, Assimp.aiTextureType_AMBIENT, "texture_height");
+        textures.addAll(heightMaps);
 
-        int[] indis = new int[indices.size()];
+        Vertex[] arrayV = new Vertex[vertices.size()];
+        for (int i = 0; i < arrayV.length; i++) {
+            arrayV[i] = vertices.get(i);
+        }
+        
+        int[] arrayI = new int[indices.size()];
         for (int i = 0; i < indices.size(); i++) {
-            indis[i] = indices.get(i);
+            arrayI[i] = indices.get(i);
+        }
+        
+        Texture[] arrayT = new Texture[textures.size()];
+        for (int i = 0; i < arrayT.length; i++) {
+            arrayT[i] = textures.get(i);
         }
 
-        return new Mesh(vertices.toArray(new Vertex[vertices.size()]), indis, textures.toArray(new Texture[textures.size()]));
+        return new Mesh(arrayV, arrayI, arrayT);
     }
 
     private List<Texture> LoadMaterialTextures(AIMaterial mat, int type, String typeName) {
@@ -146,6 +172,7 @@ public class Model {
                 texture.type = typeName;
                 texture.path = path.dataString();
                 textures.add(texture);
+                loadedTexture.add(texture);
             }
 
         }

@@ -16,9 +16,15 @@ public class Vertex {
     public Vector3f Position;
     public Vector3f Normal;
     public Vector2f TexCoords;
+    public Vector3f Tangent;
+    public Vector3f Bitangent;
     
     public float[] getFloatArray(){
-        return new float[] {Position.x, Position.y, Position.z, Normal.x, Normal.y, Normal.z, TexCoords.x, TexCoords.y};
+        return new float[] {Position.x, Position.y, Position.z, 
+                            Normal.x, Normal.y, Normal.z, 
+                            TexCoords.x, TexCoords.y, 
+                            Tangent.x, Tangent.y, Tangent.z,
+                            Bitangent.x, Bitangent.y, Bitangent.z};
     }
     
     public static float[] getFloatArray(Vertex[] vertices){
@@ -34,5 +40,26 @@ public class Vertex {
         }
         
         return array;
+    }
+    
+    public int sizeof(){
+        int size = 0;
+        
+        if (Position != null)
+            size += 3;
+        
+        if (Normal != null)
+            size += 3;
+        
+        if (TexCoords != null)
+            size += 2;
+        
+        if (Tangent != null)
+            size += 3;
+        
+        if (Bitangent != null)
+            size += 3;
+        
+        return size;
     }
 }

@@ -68,7 +68,7 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         GL.createCapabilities();   
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_ALWAYS);
+        glDepthFunc(GL_LESS);
         
         camera = new Camera(new Vector3f(0.0f, 0.0f, 3.0f), new Vector3f(0.0f, 0.0f, -1.0f), new Vector3f(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 45.0f);
 

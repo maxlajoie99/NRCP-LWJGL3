@@ -36,38 +36,72 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
 
     private Camera camera;
     
-    int objectVAO;
-    int objectVBO;
-    int lampVAO;
-    int lampVBO;
+    int cubeVAO;
+    int cubeVBO;
+    int planeVAO;
+    int planeVBO;
     
     Shader myShader;
-    Model myModel;
-            
+    
+    Image2D cubeTexture;
+    Image2D planeTexture;
+
     public LWJGLCanvas(GLData data) {
         super(data);
         this.addKeyListener(this);
         this.addMouseMotionListener(this);
         this.addMouseWheelListener(this);
     }
-    
-    Vector3f[] pointLightPositions = {
-	new Vector3f( 0.7f,  0.2f,  2.0f),
-	new Vector3f( 2.3f, -3.3f, -4.0f),
-	new Vector3f(-4.0f,  2.0f, -12.0f),
-	new Vector3f( 0.0f,  0.0f, -3.0f)
-    };  
+    float[] planeVertices = {
+        // positions         
+         5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
+        -5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
+        -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
+
+         5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
+        -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
+         5.0f, -0.5f, -5.0f,  2.0f, 2.0f								
+    };
 
     @Override
     public void initGL() {
         GL.createCapabilities();   
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glEnable(GL_DEPTH_TEST);
         
         camera = new Camera(new Vector3f(0.0f, 0.0f, 3.0f), new Vector3f(0.0f, 0.0f, -1.0f), new Vector3f(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 45.0f);
 
-        myShader = new Shader("modelshader.vs", "modelshader.fs");
-        myModel = new Model("model/nanosuit/nanosuit.obj", false);
+        //The cubes
+        cubeVAO = glGenVertexArrays();
+        cubeVBO = glGenBuffers();
+        glBindVertexArray(cubeVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+        glBufferData(GL_ARRAY_BUFFER, Cube.getCubeVertices(), GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 5 * FLOAT_SIZE, 0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, false, 5 * FLOAT_SIZE, 3 * FLOAT_SIZE);
+        glBindVertexArray(0);
+        
+        //The plane
+        planeVAO = glGenVertexArrays();
+        planeVBO = glGenBuffers();
+        glBindVertexArray(planeVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
+        glBufferData(GL_ARRAY_BUFFER, planeVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 5 * FLOAT_SIZE, 0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, false, 5 * FLOAT_SIZE, 3 * FLOAT_SIZE);
+        glBindVertexArray(0);
+        
+        //Textures
+        cubeTexture = new Image2D("marble.jpg", GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR, GL_TEXTURE0);
+        planeTexture = new Image2D("metal.png", GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR, GL_TEXTURE0);
+        
+        myShader = new Shader("depthshader.vs", "depthshader.fs");
+        myShader.use();
+        myShader.setInt("texture1", 0);
     }
     
     @Override
@@ -84,18 +118,29 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         Matrix4f projection = Matrix4f.perspective(camera.getFov(), aspect, 0.1f, 100f);
         Matrix4f view = camera.getViewMatrix();
         Matrix4f model = new Matrix4f();
-        model = model.multiply(Matrix4f.translate(0.0f, -1.75f, 0.0f));
-        model = model.multiply(Matrix4f.scale(0.2f, 0.2f, 0.2f));
+        model = model.multiply(Matrix4f.translate(-1.0f, 0.0f, -1.0f));
         
         myShader.use();
         myShader.setMatrix4f("model", model);
         myShader.setMatrix4f("projection", projection);
         myShader.setMatrix4f("view", view);
         
-        //glLineWidth(2f);
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        myModel.draw(myShader);
+        //Cube 1
+        glBindVertexArray(cubeVAO);
+        cubeTexture.bind();
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        //Cube 2
+        model = new Matrix4f();
+        model = model.multiply(Matrix4f.translate(2.0f, 0.0f, 0.0f));
+        myShader.setMatrix4f("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
         
+        //Plane
+        glBindVertexArray(planeVAO);
+        planeTexture.bind();
+        myShader.setMatrix4f("model", new Matrix4f());
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glBindVertexArray(0);
         
         swapBuffers();
     }

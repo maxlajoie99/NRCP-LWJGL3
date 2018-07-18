@@ -38,13 +38,18 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
     
     int cubeVAO;
     int cubeVBO;
+    
     int planeVAO;
     int planeVBO;
+    
+    int plantVAO;
+    int plantVBO;
     
     Shader myShader;
     
     Image2D cubeTexture;
     Image2D planeTexture;
+    Image2D plantTexture;
 
     public LWJGLCanvas(GLData data) {
         super(data);
@@ -61,6 +66,25 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
          5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
         -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
          5.0f, -0.5f, -5.0f,  2.0f, 2.0f								
+    };
+    
+    Vector3f[] plants = {
+        new Vector3f(-1.5f, 0.0f, -0.48f),
+        new Vector3f(1.5f, 0.0f, 0.51f),
+        new Vector3f(0.0f, 0.0f, 0.7f),
+        new Vector3f(-0.3f, 0.0f, -2.3f),
+        new Vector3f(0.5f, 0.0f, -0.6f)
+    };
+    
+    float[] plantVertices = {
+        // positions         // texture Coords (swapped y coordinates because texture is flipped upside down)
+        0.0f,  0.5f,  0.0f,  0.0f,  1.0f,
+        0.0f, -0.5f,  0.0f,  0.0f,  0.0f,
+        1.0f, -0.5f,  0.0f,  1.0f,  0.0f,
+
+        0.0f,  0.5f,  0.0f,  0.0f,  1.0f,
+        1.0f, -0.5f,  0.0f,  1.0f,  0.0f,
+        1.0f,  0.5f,  0.0f,  1.0f,  1.0f
     };
 
     @Override
@@ -95,9 +119,22 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         glVertexAttribPointer(1, 2, GL_FLOAT, false, 5 * FLOAT_SIZE, 3 * FLOAT_SIZE);
         glBindVertexArray(0);
         
+        //The plants
+        plantVAO = glGenVertexArrays();
+        plantVBO = glGenBuffers();
+        glBindVertexArray(plantVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, plantVBO);
+        glBufferData(GL_ARRAY_BUFFER, plantVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 5 * FLOAT_SIZE, 0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, false, 5 * FLOAT_SIZE, 3 * FLOAT_SIZE);
+        glBindVertexArray(0);
+        
         //Textures
         cubeTexture = new Image2D("marble.jpg", GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR, GL_TEXTURE0);
         planeTexture = new Image2D("metal.png", GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR, GL_TEXTURE0);
+        plantTexture = new Image2D("grass.png", GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR, GL_TEXTURE0);
         
         myShader = new Shader("depthshader.vs", "depthshader.fs");
         myShader.use();
@@ -141,6 +178,16 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         model = model.multiply(Matrix4f.translate(2.0f, 0.0f, 0.0f));
         myShader.setMatrix4f("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
+        
+        //Plants
+        glBindVertexArray(plantVAO);
+        plantTexture.bind();
+        for (Vector3f p : plants) {
+            model = new Matrix4f();
+            model = model.multiply(Matrix4f.translate(p));
+            myShader.setMatrix4f("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+        }
         
         swapBuffers();
     }

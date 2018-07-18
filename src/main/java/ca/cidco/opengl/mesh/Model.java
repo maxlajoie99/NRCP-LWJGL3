@@ -9,6 +9,7 @@ import ca.cidco.math.Vector2f;
 import ca.cidco.math.Vector3f;
 import ca.cidco.opengl.Image2D;
 import ca.cidco.opengl.Shader;
+import java.io.File;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,10 +49,10 @@ public class Model {
 
     //https://lwjglgamedev.gitbooks.io/3d-game-development-with-lwjgl/content/chapter27/chapter27.html
     private void LoadModel(String path) {
-        AIScene scene = Assimp.aiImportFile(path, Assimp.aiProcess_Triangulate | Assimp.aiProcess_FlipUVs | Assimp.aiProcess_CalcTangentSpace);
+        AIScene scene = Assimp.aiImportFile(new File(path).getAbsolutePath(), Assimp.aiProcess_Triangulate | Assimp.aiProcess_FlipUVs | Assimp.aiProcess_CalcTangentSpace);
 
         if (scene == null) {
-            System.out.println("Error while loading the model\n" + Assimp.aiGetErrorString());
+            System.out.println("Error while loading the model : " + Assimp.aiGetErrorString());
             return;
         }
 

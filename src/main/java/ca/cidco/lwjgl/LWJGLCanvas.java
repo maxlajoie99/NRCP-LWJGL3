@@ -10,7 +10,6 @@ import ca.cidco.opengl.CAMERA_MOVEMENT;
 import ca.cidco.opengl.Camera;
 import ca.cidco.opengl.Image2D;
 import ca.cidco.opengl.Shader;
-import ca.cidco.opengl.mesh.Model;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -19,6 +18,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import org.lwjgl.opengl.GL;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL12.*;
 import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
@@ -134,7 +134,7 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         //Textures
         cubeTexture = new Image2D("marble.jpg", GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR, GL_TEXTURE0);
         planeTexture = new Image2D("metal.png", GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR, GL_TEXTURE0);
-        plantTexture = new Image2D("grass.png", GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR, GL_TEXTURE0);
+        plantTexture = new Image2D("grass.png", GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_LINEAR, GL_LINEAR, GL_TEXTURE0);
         
         myShader = new Shader("depthshader.vs", "depthshader.fs");
         myShader.use();

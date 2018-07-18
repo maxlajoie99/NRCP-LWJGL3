@@ -77,7 +77,6 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
     };
     
     float[] plantVertices = {
-        // positions         // texture Coords (swapped y coordinates because texture is flipped upside down)
         0.0f,  0.5f,  0.0f,  0.0f,  1.0f,
         0.0f, -0.5f,  0.0f,  0.0f,  0.0f,
         1.0f, -0.5f,  0.0f,  1.0f,  0.0f,
@@ -132,9 +131,9 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         glBindVertexArray(0);
         
         //Textures
-        cubeTexture = new Image2D("marble.jpg", GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR, GL_TEXTURE0);
-        planeTexture = new Image2D("metal.png", GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR, GL_TEXTURE0);
-        plantTexture = new Image2D("grass.png", GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_LINEAR, GL_LINEAR, GL_TEXTURE0);
+        cubeTexture = new Image2D("marble.jpg", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_TEXTURE0);
+        planeTexture = new Image2D("metal.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_TEXTURE0);
+        plantTexture = new Image2D("grass.png", GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_TEXTURE0);
         
         myShader = new Shader("depthshader.vs", "depthshader.fs");
         myShader.use();

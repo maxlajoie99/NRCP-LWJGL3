@@ -9,6 +9,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import javax.imageio.ImageIO;
 import org.lwjgl.BufferUtils;
@@ -30,26 +31,14 @@ public class Image2D {
     
     public Image2D(String fileName, int wrapS, int wrapT, int minFilter, int magFilter, int textureUnit){
         Unit = textureUnit;
-        ID = glGenTextures();
-        
-        glActiveTexture(Unit);
-        glBindTexture(GL_TEXTURE_2D, ID);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapS);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);    
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
-        
-        ByteBuffer data = loadImage(fileName, width, height, true);
-        if (data != null){
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width[0], height[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-            glGenerateMipmap(GL_TEXTURE_2D);
-        }
-        else{
-            System.out.println("Failed to load texture");
-        }
+        SetupTexture(fileName, wrapS, wrapT, minFilter, magFilter, true);
     }
     
     public Image2D(String fileName, int wrapS, int wrapT, int minFilter, int magFilter){
+        SetupTexture(fileName, wrapS, wrapT, minFilter, magFilter, false);
+    }
+    
+    private void SetupTexture(String fileName, int wrapS, int wrapT, int minFilter, int magFilter, boolean inJAR){
         ID = glGenTextures();
         
         glBindTexture(GL_TEXTURE_2D, ID);
@@ -58,7 +47,7 @@ public class Image2D {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);    
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
         
-        ByteBuffer data = loadImage(fileName, width, height, false);
+        ByteBuffer data = loadImage(fileName, width, height, inJAR);
         if (data != null){
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width[0], height[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
             glGenerateMipmap(GL_TEXTURE_2D);
@@ -138,8 +127,8 @@ public class Image2D {
             
             return buffer;
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("Failed to load image");
         }
         
         return null;

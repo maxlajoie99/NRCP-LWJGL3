@@ -56,7 +56,7 @@ public class Model {
             return;
         }
 
-        folder = path.substring(path.lastIndexOf("/") + 1, path.length());
+        folder = path.substring(0, path.lastIndexOf("/"));
         ProcessNode(scene.mRootNode(), scene);
 
     }

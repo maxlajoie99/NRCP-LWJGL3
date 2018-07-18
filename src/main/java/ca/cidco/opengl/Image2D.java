@@ -8,6 +8,7 @@ package ca.cidco.opengl;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.nio.ByteBuffer;
 import javax.imageio.ImageIO;
 import org.lwjgl.BufferUtils;
@@ -38,7 +39,7 @@ public class Image2D {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);    
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
         
-        ByteBuffer data = loadImage(fileName, width, height);
+        ByteBuffer data = loadImage(fileName, width, height, true);
         if (data != null){
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width[0], height[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
             glGenerateMipmap(GL_TEXTURE_2D);
@@ -57,7 +58,7 @@ public class Image2D {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);    
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
         
-        ByteBuffer data = loadImage(fileName, width, height);
+        ByteBuffer data = loadImage(fileName, width, height, false);
         if (data != null){
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width[0], height[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
             glGenerateMipmap(GL_TEXTURE_2D);
@@ -90,10 +91,14 @@ public class Image2D {
         return ID;
     }
     
-    public static ByteBuffer loadImage(String filename, int[] width, int[] height) {
+    public static ByteBuffer loadImage(String filename, int[] width, int[] height, boolean fromJAR) {
         //https://github.com/SilverTiger/lwjgl3-tutorial/wiki/Textures
         try {
-            BufferedImage image = ImageIO.read(Image2D.class.getResourceAsStream("images/" + filename));
+            BufferedImage image;
+            if (fromJAR)
+                image = ImageIO.read(Image2D.class.getResourceAsStream("images/" + filename));
+            else
+                image = ImageIO.read(new File(filename).getAbsoluteFile());
 
             //Flip
             AffineTransform transform = AffineTransform.getScaleInstance(1f, -1f);

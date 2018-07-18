@@ -42,6 +42,7 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
     int planeVBO;
     
     Shader myShader;
+    Shader singleColor;
     
     Image2D cubeTexture;
     Image2D planeTexture;
@@ -68,11 +69,11 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         GL.createCapabilities();   
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
         glEnable(GL_STENCIL_TEST);
-        
-        glStencilMask(0xFF);    //Enable writing (Everything stay the same)
-        //glStencilMask(0x00);    //Disable writing (Everything ends up as 0)
-        
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+              
         camera = new Camera(new Vector3f(0.0f, 0.0f, 3.0f), new Vector3f(0.0f, 0.0f, -1.0f), new Vector3f(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 45.0f);
 
         //The cubes
@@ -104,6 +105,7 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         planeTexture = new Image2D("metal.png", GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR, GL_TEXTURE0);
         
         myShader = new Shader("depthshader.vs", "depthshader.fs");
+        singleColor = new Shader("depthshader.vs", "singlecolor.fs");
         myShader.use();
         myShader.setInt("texture1", 0);
     }
@@ -122,16 +124,31 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         Matrix4f projection = Matrix4f.perspective(camera.getFov(), aspect, 0.1f, 100f);
         Matrix4f view = camera.getViewMatrix();
         Matrix4f model = new Matrix4f();
-        model = model.multiply(Matrix4f.translate(-1.0f, 0.0f, -1.0f));
+
+        singleColor.use();
+        singleColor.setMatrix4f("projection", projection);
+        singleColor.setMatrix4f("view", view);
         
         myShader.use();
-        myShader.setMatrix4f("model", model);
         myShader.setMatrix4f("projection", projection);
         myShader.setMatrix4f("view", view);
         
+        //Plane
+        glStencilMask(0x00);
+        glBindVertexArray(planeVAO);
+        planeTexture.bind();
+        myShader.setMatrix4f("model", new Matrix4f());
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glBindVertexArray(0);
+        
+        //First render pass
         //Cube 1
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
         glBindVertexArray(cubeVAO);
         cubeTexture.bind();
+        model = model.multiply(Matrix4f.translate(-1.0f, 0.0f, -1.0f));
+        myShader.setMatrix4f("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         //Cube 2
         model = new Matrix4f();
@@ -139,12 +156,29 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         myShader.setMatrix4f("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         
-        //Plane
-        glBindVertexArray(planeVAO);
-        planeTexture.bind();
-        myShader.setMatrix4f("model", new Matrix4f());
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        //Second render pass, draw outline
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glStencilMask(0x00);
+        glDisable(GL_DEPTH_TEST);
+        singleColor.use();
+        float scale = 1.1f;
+        glBindVertexArray(cubeVAO);
+        cubeTexture.bind();
+        model = new Matrix4f();
+        model = model.multiply(Matrix4f.translate(-1.0f, 0.0f, -1.0f));
+        model = model.multiply(Matrix4f.scale(scale, scale, scale));
+        singleColor.setMatrix4f("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        
+        model = new Matrix4f();
+        model = model.multiply(Matrix4f.translate(2.0f, 0.0f, 0.0f));
+        model = model.multiply(Matrix4f.scale(scale, scale, scale));
+        singleColor.setMatrix4f("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
         glBindVertexArray(0);
+        glStencilMask(0xFF);
+        glEnable(GL_DEPTH_TEST);
         
         swapBuffers();
     }

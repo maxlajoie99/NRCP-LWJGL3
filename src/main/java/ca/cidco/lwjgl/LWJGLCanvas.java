@@ -67,7 +67,7 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         camera = new Camera(new Vector3f(0.0f, 0.0f, 3.0f), new Vector3f(0.0f, 0.0f, -1.0f), new Vector3f(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 45.0f);
 
         myShader = new Shader("modelshader.vs", "modelshader.fs");
-        myModel = new Model("/home/mlajoie/Workspace/MavenLWJGL/src/main/resources/ca/cidco/lwjgl/nanosuit.obj");
+        myModel = new Model("/home/mlajoie/Workspace/MavenLWJGL/model/nanosuit/nanosuit.obj");
     }
     
     @Override
@@ -92,6 +92,8 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         myShader.setMatrix4f("projection", projection);
         myShader.setMatrix4f("view", view);
         
+        //glLineWidth(2f);
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         myModel.draw(myShader);
         
         

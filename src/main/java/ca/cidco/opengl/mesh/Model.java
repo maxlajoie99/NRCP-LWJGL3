@@ -5,8 +5,8 @@
  */
 package ca.cidco.opengl.mesh;
 
-import ca.cidco.math.Vector2f;
-import ca.cidco.math.Vector3f;
+import org.lwjgl.math.Vector2f;
+import org.lwjgl.math.Vector3f;
 import ca.cidco.opengl.Image2D;
 import ca.cidco.opengl.Shader;
 import java.io.File;

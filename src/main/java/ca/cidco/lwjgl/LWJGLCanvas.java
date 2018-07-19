@@ -5,7 +5,8 @@
  */
 package ca.cidco.lwjgl;
 
-import ca.cidco.math.*;
+import org.lwjgl.math.Matrix4f;
+import org.lwjgl.math.Vector3f;
 import ca.cidco.opengl.CAMERA_MOVEMENT;
 import ca.cidco.opengl.Camera;
 import ca.cidco.opengl.Image2D;

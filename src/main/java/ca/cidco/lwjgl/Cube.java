@@ -5,7 +5,7 @@
  */
 package ca.cidco.lwjgl;
 
-import ca.cidco.math.Vector3f;
+import org.lwjgl.math.Vector3f;
 
 /**
  *

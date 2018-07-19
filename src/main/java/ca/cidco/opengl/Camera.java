@@ -5,8 +5,8 @@
  */
 package ca.cidco.opengl;
 
-import ca.cidco.math.Matrix4f;
-import ca.cidco.math.Vector3f;
+import org.lwjgl.math.Matrix4f;
+import org.lwjgl.math.Vector3f;
 
 /**
  *

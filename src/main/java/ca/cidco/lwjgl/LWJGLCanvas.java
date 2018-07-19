@@ -17,6 +17,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.TreeMap;
 import org.lwjgl.opengl.GL;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.*;
@@ -43,14 +44,14 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
     int planeVAO;
     int planeVBO;
     
-    int plantVAO;
-    int plantVBO;
+    int windowVAO;
+    int windowVBO;
     
     Shader myShader;
     
     Image2D cubeTexture;
     Image2D planeTexture;
-    Image2D plantTexture;
+    Image2D windowTexture;
 
     public LWJGLCanvas(GLData data) {
         super(data);
@@ -69,7 +70,7 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
          5.0f, -0.5f, -5.0f,  2.0f, 2.0f								
     };
     
-    Vector3f[] plants = {
+    Vector3f[] windows = {
         new Vector3f(-1.5f, 0.0f, -0.48f),
         new Vector3f(1.5f, 0.0f, 0.51f),
         new Vector3f(0.0f, 0.0f, 0.7f),
@@ -77,7 +78,7 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         new Vector3f(0.5f, 0.0f, -0.6f)
     };
     
-    float[] plantVertices = {
+    float[] windowVertices = {
         0.0f,  0.5f,  0.0f,  0.0f,  1.0f,
         0.0f, -0.5f,  0.0f,  0.0f,  0.0f,
         1.0f, -0.5f,  0.0f,  1.0f,  0.0f,
@@ -92,6 +93,9 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         GL.createCapabilities();   
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        
               
         camera = new Camera(new Vector3f(0.0f, 0.0f, 3.0f), new Vector3f(0.0f, 0.0f, -1.0f), new Vector3f(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 45.0f);
 
@@ -119,12 +123,12 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         glVertexAttribPointer(1, 2, GL_FLOAT, false, 5 * FLOAT_SIZE, 3 * FLOAT_SIZE);
         glBindVertexArray(0);
         
-        //The plants
-        plantVAO = glGenVertexArrays();
-        plantVBO = glGenBuffers();
-        glBindVertexArray(plantVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, plantVBO);
-        glBufferData(GL_ARRAY_BUFFER, plantVertices, GL_STATIC_DRAW);
+        //The windows
+        windowVAO = glGenVertexArrays();
+        windowVBO = glGenBuffers();
+        glBindVertexArray(windowVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, windowVBO);
+        glBufferData(GL_ARRAY_BUFFER, windowVertices, GL_STATIC_DRAW);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 5 * FLOAT_SIZE, 0);
         glEnableVertexAttribArray(1);
@@ -134,7 +138,7 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         //Textures
         cubeTexture = new Image2D("marble.jpg", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_TEXTURE0);
         planeTexture = new Image2D("metal.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_TEXTURE0);
-        plantTexture = new Image2D("grass.png", GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_TEXTURE0);
+        windowTexture = new Image2D("window.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_TEXTURE0);
         
         myShader = new Shader("depthshader.vs", "depthshader.fs");
         myShader.use();
@@ -179,10 +183,16 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         myShader.setMatrix4f("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         
-        //Plants
-        glBindVertexArray(plantVAO);
-        plantTexture.bind();
-        for (Vector3f p : plants) {
+        TreeMap<Float, Vector3f> map = new TreeMap();
+        for (Vector3f window : windows) {
+            float distance = camera.getPosition().subtract(window).lengthSquared();
+            map.put(distance, window);
+        }
+        
+        //Windows
+        glBindVertexArray(windowVAO);
+        windowTexture.bind();
+        for (Vector3f p : map.descendingMap().values()) {
             model = new Matrix4f();
             model = model.multiply(Matrix4f.translate(p));
             myShader.setMatrix4f("model", model);

@@ -61,13 +61,13 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
     }
     float[] planeVertices = {
         // positions         
-         5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
+        -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
         -5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
-        -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
-
          5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
+        
+         5.0f, -0.5f, -5.0f,  2.0f, 2.0f,
         -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
-         5.0f, -0.5f, -5.0f,  2.0f, 2.0f								
+         5.0f, -0.5f,  5.0f,  2.0f, 0.0f,								
     };
     
     Vector3f[] windows = {
@@ -95,7 +95,9 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glFrontFace(GL_CCW);
               
         camera = new Camera(new Vector3f(0.0f, 0.0f, 3.0f), new Vector3f(0.0f, 0.0f, -1.0f), new Vector3f(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 45.0f);
 

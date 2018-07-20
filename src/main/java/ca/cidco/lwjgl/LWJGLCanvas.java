@@ -259,6 +259,8 @@ public class LWJGLCanvas extends AWTGLCanvas implements KeyListener, MouseMotion
         glBindTexture(GL_TEXTURE_2D, colorBuffer);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
+        glDeleteFramebuffers(FBO);
+        
         swapBuffers();
     }
 
